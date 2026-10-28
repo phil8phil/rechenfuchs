@@ -1,0 +1,17 @@
+{
+  "name": "Rechenfuchs – Mathe spielerisch",
+  "short_name": "Rechenfuchs",
+  "description": "9 Mathe-Spiele für die 2. Klasse: Rechnen bis 100 ohne Finger.",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFF7EC",
+  "theme_color": "#FF7A1A",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
