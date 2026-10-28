@@ -20,6 +20,11 @@ Web-App (PWA) für iPhone und iPad: kein Server, kein Login, alle Daten bleiben 
 8. 🎲 Rückwärts bis 50
 9. 🎃 Süßes oder Rechnen – Halloween-Brettspiel auf dem Kürbisfeld
 
+**Reise zum Schloss (Gesamtziel):** Jede richtige Antwort ist ein Schritt auf der Karte. König oder Königin
+wandert an 6 Hindernissen vorbei zum Märchenschloss, wo der Partner wartet. Ziel: 120 ⭐ (ca. 1 Woche, im
+Eltern-Bereich auf 80–200 einstellbar). Danach gibt es ein Schlossfest, einen Reise-Pokal und eine neue Karte
+(Märchenwald → Winterland → Zauberinsel → Zuckerland).
+
 Jedes Spiel hat 3 Stufen. Nach einer fast fehlerfreien Runde geht es automatisch eine Stufe höher.
 Bei einem Fehler gibt es erst einen Tipp, beim zweiten die Lösung mit Rechenweg.
 Jede richtige Antwort = 1 ⭐, alle 15 ⭐ gibt es einen Sticker (30 insgesamt).
@@ -51,7 +56,7 @@ Der Eltern-Bereich (mit kleiner Rechenfrage gesichert) zeigt Statistik, knifflig
 
 Nach jeder Änderung in `sw.js` die Version erhöhen:
 ```js
-const CACHE = 'rechenfuchs-v1.0.1';
+const CACHE = 'rechenfuchs-v1.1.1';
 ```
 Sonst lädt das iPhone die neue Version nicht. Danach die App einmal schließen und neu öffnen.
 

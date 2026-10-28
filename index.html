@@ -328,6 +328,52 @@ h1,h2,h3,p{margin:0}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:80;overflow:hidden}
 .confetti i{position:absolute;top:-30px;font-style:normal;animation:fall linear forwards}
 
+
+/* ---------- Reise zum Schloss ---------- */
+.goals{display:grid;gap:14px}
+.jmini{display:block;width:100%;text-align:left}
+.jmini .gr{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700}
+.jtrack{position:relative;height:14px;border-radius:99px;background:var(--bg2);margin:20px 34px 12px 6px}
+.jtrack i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#C084FC,#8B5CF6);transition:width .6s}
+.jtrack .jt{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:var(--line);border:2px solid var(--card);transform:translate(-50%,-50%)}
+.jtrack .jt.on{background:#FFC93C}
+.jtrack .jhero{position:absolute;top:50%;transform:translate(-50%,-64%);font-size:28px;line-height:1;transition:left .6s;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+.jtrack .jcastle{position:absolute;right:-36px;top:50%;transform:translateY(-62%);font-size:30px;line-height:1}
+.jhead .jt1{font-size:13px;font-weight:800;color:#8B5CF6;text-transform:uppercase;letter-spacing:.06em}
+.jhead h2{font-size:24px;font-weight:900;letter-spacing:-.02em;margin:2px 0 4px}
+.jsub{font-size:15px;color:var(--muted);font-weight:600;line-height:1.4}
+.jbar i{background:linear-gradient(90deg,#C084FC,#8B5CF6)}
+.jnext{font-size:15px;font-weight:650;line-height:1.4;margin-top:2px}
+.jnext b{font-weight:900}
+.mapwrap{max-width:560px;margin:14px auto 0;border-radius:26px;overflow:hidden;box-shadow:var(--shadow);background:var(--card)}
+#jmap{display:block;width:100%;height:auto;font-family:var(--font)}
+#jmap .chk{opacity:0;transition:opacity .3s}
+#jmap .ob.done .chk{opacity:1}
+#jmap .ob.done .obc{stroke:#1FAF6A}
+.hbob{animation:hbob 1.4s ease-in-out infinite}
+.twk{animation:twk 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.wait{animation:hbob 2.4s ease-in-out infinite}
+.trow{display:flex;flex-wrap:wrap;gap:10px;font-size:34px}
+.celsvg{width:100%;max-width:280px;display:block;margin:-8px auto 2px}
+.trophy{font-weight:800;margin:0 0 14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.trophy span{font-size:34px}
+.herosel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.herosel button{background:var(--bg);border:3px solid transparent;border-radius:18px;padding:10px 6px;font-weight:800;font-size:16px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.herosel button span{font-size:44px;line-height:1.1}
+.herosel button small{font-size:12px;color:var(--muted);font-weight:650}
+.herosel button.on{border-color:#8B5CF6;background:color-mix(in srgb,#8B5CF6 14%,var(--card))}
+.herosel.nudge{animation:shake .35s}
+.oblabel{font-weight:800;color:var(--ink);margin:0 0 8px}
+.jline{font-weight:800;background:color-mix(in srgb,#8B5CF6 14%,var(--card));color:#8B5CF6;border-radius:16px;padding:10px 14px}
+.modal{max-height:calc(100dvh - 40px);overflow-y:auto}
+.chips button{padding:0 9px}
+.row.wrap{flex-wrap:wrap;row-gap:8px}
+.row.wrap .rl{flex:1 1 100%}
+.row.wrap .chips{margin-left:34px}
+@keyframes hbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes twk{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+@media (min-width:700px){ .goals{grid-template-columns:1fr 1fr} }
+
 @keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
 @keyframes bump{0%,100%{transform:scale(1)}40%{transform:scale(1.3)}}
@@ -379,6 +425,7 @@ h1,h2,h3,p{margin:0}
   <main id="view"></main>
   <nav class="tabbar" id="tabbar">
     <button class="tab" data-tab="home"><span class="ti">🎮</span>Spiele</button>
+    <button class="tab" data-tab="reise"><span class="ti">🏰</span>Reise</button>
     <button class="tab" data-tab="sticker"><span class="ti">🌟</span>Sticker</button>
     <button class="tab" data-tab="eltern"><span class="ti">👪</span>Eltern</button>
   </nav>
@@ -392,9 +439,9 @@ h1,h2,h3,p{margin:0}
    Rechenfuchs – Mathe-Spiele für die 2. Klasse
    Alle Daten bleiben lokal im Gerät (localStorage).
    ========================================================= */
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const KEY = 'rechenfuchs.v1';
-const SCHEMA = 1;
+const SCHEMA = 2;
 const STARS_PER_STICKER = 15;
 const STICKERS = ['🐶','🐱','🐰','🦁','🐼','🐨','🐯','🦄','🐸','🐵','🐧','🐢','🦋','🐙','🦀','🐳','🦖','🦔','🦉','🐞','🚀','🌈','⚽','🎸','🏰','🍦','🎈','🧩','🛸','👑'];
 const AVATARS = ['🐻','🐼','🐯','🦁','🐰','🐨','🐸','🦄','🐵','🐧','🐶','🐱'];
@@ -442,6 +489,47 @@ const GAMES = [
 const GAME = Object.fromEntries(GAMES.map(g => [g.id, g]));
 const SECTIONS = ['Kopfrechen-Basics', 'Im Auto oder Wartezimmer', 'Zuhause am Tisch'];
 
+/* ---------- Reise zum Schloss: Daten ---------- */
+const JOURNEY_TARGETS = [80, 120, 160, 200];
+const OBS_F = [.13, .29, .45, .6, .75, .9];
+const GATE = {e:'🔒', n:'Das Schlosstor', ok:'Das Schlosstor ist offen!', after:'🔓'};
+const THEMES = [
+  {key:'wald', name:'Märchenwald', title:'Durch den Märchenwald', bg:['#CFEFB8','#86CB72'], hill:'#6DBB5C', trail:'#F1DDAE', river:'#4FB3E8', accent:'#2F8F46', trophy:'🌳',
+   decor:['🌳','🌲','🌼','🍄','🌷','🦋','🐇','🌳','🌻','🐿️'],
+   obs:[{e:'🌲', n:'Der dunkle Wald', ok:'Durch den dunklen Wald!'},
+        {e:'🌊', n:'Der wilde Fluss', ok:'Über den wilden Fluss!', after:'🌉', river:true},
+        {e:'🐸', n:'Der Froschsumpf', ok:'Durch den Froschsumpf!'},
+        {e:'⛰️', n:'Der hohe Berg', ok:'Über den hohen Berg!'},
+        {e:'🐉', n:'Der kleine Drache', ok:'Der Drache ist jetzt ein Freund!', after:'💚'}, GATE]},
+  {key:'winter', name:'Winterland', title:'Durch das Winterland', bg:['#F3FAFF','#BCDCF4'], hill:'#FFFFFF', trail:'#DDE8F3', river:'#A9DDF5', accent:'#3B82C4', trophy:'⛄',
+   decor:['🌲','❄️','⛄','🐧','🦌','🌲','🐻‍❄️','❄️'],
+   obs:[{e:'⛄', n:'Das Schneemann-Feld', ok:'Vorbei am Schneemann-Feld!'},
+        {e:'🧊', n:'Der Eissee', ok:'Über den glatten Eissee!', after:'⛸️', river:true},
+        {e:'🌨️', n:'Der Schneesturm', ok:'Der Schneesturm ist vorbei!', after:'🌤️'},
+        {e:'🏔️', n:'Der Gletscher', ok:'Über den Gletscher!'},
+        {e:'🐺', n:'Der Wolf', ok:'Der Wolf wollte nur spielen!', after:'🐶'}, GATE]},
+  {key:'insel', name:'Zauberinsel', title:'Über die Zauberinsel', bg:['#FFF4D2','#F4D38C'], hill:'#8FD8B8', trail:'#FFF8E8', river:'#2EB5D6', accent:'#0E9AA7', trophy:'🏝️',
+   decor:['🌴','🐚','🌺','🐢','🦜','🌴','🦩','🐠'],
+   obs:[{e:'🌴', n:'Der Palmendschungel', ok:'Durch den Palmendschungel!'},
+        {e:'⛵', n:'Das große Meer', ok:'Mit dem Boot übers Meer!', river:true},
+        {e:'🦀', n:'Der Krabbenstrand', ok:'Vorbei an den Krabben!'},
+        {e:'🌋', n:'Der Vulkan', ok:'Am Vulkan vorbei!'},
+        {e:'🐙', n:'Der Riesenkrake', ok:'Der Krake winkt zum Abschied!', after:'👋'}, GATE]},
+  {key:'zucker', name:'Zuckerland', title:'Durch das Zuckerland', bg:['#FFEAF4','#FFC4DF'], hill:'#FFD9AE', trail:'#FFFFFF', river:'#8B5A2B', accent:'#E0457B', trophy:'🍭',
+   decor:['🍭','🍬','🧁','🍩','🍦','🍪','🍓','🍬'],
+   obs:[{e:'🍭', n:'Der Lolli-Wald', ok:'Durch den Lolli-Wald!'},
+        {e:'🍫', n:'Der Schokofluss', ok:'Über den Schokoladenfluss!', after:'🌉', river:true},
+        {e:'🍯', n:'Der Honigsumpf', ok:'Raus aus dem klebrigen Honig!'},
+        {e:'🎂', n:'Der Tortenberg', ok:'Über den Tortenberg!'},
+        {e:'🐝', n:'Die Bienenwiese', ok:'Die Bienen summen fröhlich!', after:'🌸'}, GATE]}
+];
+const WAY = [[60,712],[190,700],[300,652],[282,578],[160,548],[68,494],[86,420],[216,392],[300,334],[262,276],[140,258],[180,212]];
+const HEROES = {
+  king:  {e:'🤴', p:'👸', name:'König',   Der:'Der König',   akk:'den König',   pDie:'Die Königin', pDat:'zur Königin'},
+  queen: {e:'👸', p:'🤴', name:'Königin', Der:'Die Königin', akk:'die Königin', pDie:'Der König',   pDat:'zum König'}
+};
+
+
 /* ---------- helpers ---------- */
 const $ = (s, el = document) => el.querySelector(s);
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
@@ -457,7 +545,8 @@ function defaultGame(){ return {level:1, rounds:0, correct:0, wrong:0, best:0, w
 function defaults(){
   const games = {}; GAMES.forEach(g => games[g.id] = defaultGame());
   return {schema:SCHEMA, created:Date.now(), profile:{name:'', avatar:'🐻', onboarded:false},
-    settings:{sound:true, dailyGoal:20}, games, stars:0, stickers:[], mistakes:[], days:{}, goalDays:[]};
+    settings:{sound:true, dailyGoal:20}, games, stars:0, stickers:[], mistakes:[], days:{}, goalDays:[],
+    journey:{hero:null, n:0, start:0, target:120, seen:0, trophies:[]}};
 }
 function normalize(raw){
   const d = defaults();
@@ -488,6 +577,17 @@ function normalize(raw){
   const keys = Object.keys(out.days).sort();
   keys.slice(0, Math.max(0, keys.length - 120)).forEach(k => delete out.days[k]);
   out.goalDays = Array.isArray(s.goalDays) ? s.goalDays.slice(-120) : [];
+  // Schema 2: Reise zum Schloss. Bestehende Stände starten die Reise beim aktuellen Sternestand.
+  const sj = s.journey && typeof s.journey === 'object' ? s.journey : null;
+  out.journey = {
+    hero: sj && ['king', 'queen'].includes(sj.hero) ? sj.hero : null,
+    n: sj ? Math.max(0, parseInt(sj.n, 10) || 0) : 0,
+    start: sj ? Math.max(0, parseInt(sj.start, 10) || 0) : out.stars,
+    target: sj && [80, 120, 160, 200].includes(+sj.target) ? +sj.target : 120,
+    seen: sj ? Math.max(0, parseInt(sj.seen, 10) || 0) : 0,
+    trophies: sj && Array.isArray(sj.trophies) ? sj.trophies.filter(x => typeof x === 'string').slice(-200) : []
+  };
+  if(out.journey.start > out.stars) out.journey.start = out.stars;
   return out;
 }
 let state;
@@ -531,12 +631,12 @@ let tab = 'home', parentOK = false, keyHandler = null, cur = null;
 const ABORT = {abort:true};
 
 function toast(txt, ms = 2400){
+  document.querySelectorAll('.toast').forEach(x => x.remove());
   const t = document.createElement('div'); t.className = 'toast'; t.textContent = txt;
   document.body.appendChild(t); setTimeout(() => t.remove(), ms);
 }
-function confetti(n = 60){
+function confetti(n = 60, items = ['⭐','🎉','✨','🟠','🟣','🟢','🔵','🦊']){
   const box = document.createElement('div'); box.className = 'confetti';
-  const items = ['⭐','🎉','✨','🟠','🟣','🟢','🔵','🦊'];
   for(let i = 0; i < n; i++){
     const e = document.createElement('i'); e.textContent = pick(items);
     e.style.left = Math.random() * 100 + 'vw'; e.style.fontSize = rnd(16, 32) + 'px';
@@ -640,12 +740,14 @@ function stickerPopup(st){
 /* ---------- Navigation ---------- */
 $('#tabbar').addEventListener('click', e => {
   const b = e.target.closest('[data-tab]'); if(!b) return;
-  sfx.tap(); tab = b.dataset.tab; renderView(); window.scrollTo(0, 0);
+  sfx.tap(); tab = b.dataset.tab; window.scrollTo(0, 0); renderView();
 });
 function renderView(){
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === tab));
   updateStarPill();
+  mapToken++;
   if(tab === 'home') viewHome();
+  else if(tab === 'reise') viewReise();
   else if(tab === 'sticker') viewStickers();
   else viewEltern();
 }
@@ -665,11 +767,11 @@ function viewHome(){
   html += `<section class="hero"><div class="av">${state.profile.avatar}</div><div>
       <div class="hello">Hallo${state.profile.name ? ', ' + esc(state.profile.name) : ''}!</div>
       <div class="hello-sub">${pick(['Was spielen wir heute?','Bereit für ein Rechenspiel?','Der Fuchs wartet schon auf dich!'])}</div></div></section>
-    <section class="card goal">
+    <div class="goals"><section class="card goal">
       <div class="gr"><span>🎯 Tagesziel</span><span>${today} / ${goal} ${today >= goal ? '🏆' : ''}</span></div>
       <div class="bar"><i style="width:${pct}%"></i></div>
       <div class="gr small"><span>⭐ ${state.stars} Sterne</span><span>${allSt ? 'Album komplett! 👑' : `Noch ${toNext} ⭐ bis zum nächsten Sticker`}</span></div>
-    </section>`;
+    </section>${journeyMini()}</div>`;
   SECTIONS.forEach((sec, i) => {
     html += `<h2 class="sec">${sec}</h2><div class="grid">` + GAMES.filter(g => g.sec === i).map(g => {
       const st = state.games[g.id];
@@ -683,6 +785,7 @@ function viewHome(){
 view.addEventListener('click', e => {
   const g = e.target.closest('[data-game]');
   if(g){ sfx.tap(); openIntro(g.dataset.game); return; }
+  if(e.target.closest('[data-goreise]')){ sfx.tap(); tab = 'reise'; window.scrollTo(0, 0); renderView(); return; }
   if(e.target.closest('[data-hideinstall]')){ sessionStorage.setItem('rf.hideInstall', '1'); renderView(); }
 });
 
@@ -696,7 +799,8 @@ function viewStickers(){
       <div class="bar"><i style="width:${have >= STICKERS.length ? 100 : (STARS_PER_STICKER - toNext) / STARS_PER_STICKER * 100}%"></i></div>
       <div class="small">Für jede richtige Antwort gibt es einen Stern. Alle ${STARS_PER_STICKER} Sterne klebst du einen neuen Sticker ein.</div>
     </div>
-    <div class="sgrid">${STICKERS.map((s, i) => state.stickers.includes(s) ? `<div class="stk">${s}</div>` : `<div class="stk lock">${i + 1}</div>`).join('')}</div>`;
+    <div class="sgrid">${STICKERS.map((s, i) => state.stickers.includes(s) ? `<div class="stk">${s}</div>` : `<div class="stk lock">${i + 1}</div>`).join('')}</div>
+    ${state.journey.trophies.length ? `<h2 class="sec">Reise-Pokale 🏰</h2><div class="sgrid">${state.journey.trophies.map(t => `<div class="stk">${t}</div>`).join('')}</div>` : ''}`;
 }
 
 /* ---------- Eltern ---------- */
@@ -732,6 +836,12 @@ function viewEltern(){
     <div class="card"><h3>🧐 Knifflige Aufgaben</h3>
       ${state.mistakes.length ? state.mistakes.slice(0, 15).map(m => `<div class="mist"><div><div class="mt">${esc(m.t)}</div><div class="stat">${GAME[m.g] ? GAME[m.g].emoji + ' ' + GAME[m.g].title : ''}</div></div><div class="mg">Antwort: ${esc(m.a)}<br>richtig: <b>${esc(m.c)}</b></div></div>`).join('') : '<div class="stat">Noch keine Fehler – oder noch nicht gespielt. 😊</div>'}
     </div>
+    <div class="card"><h3>🏰 Reise zum Schloss</h3>
+      <div class="row"><div class="rl"><span>${heroInfo().e}</span>Wer reist?</div><div class="chips"><button data-hero="king" class="${state.journey.hero === 'king' ? 'on' : ''}">🤴 König</button><button data-hero="queen" class="${state.journey.hero === 'queen' ? 'on' : ''}">👸 Königin</button></div></div>
+      <div class="row wrap"><div class="rl"><span>⭐</span><div>Sterne pro Reise<div class="stat">ca. ${Math.max(1, Math.round(state.journey.target / state.settings.dailyGoal))} Tage bei ${state.settings.dailyGoal} Aufgaben/Tag</div></div></div><div class="chips">${JOURNEY_TARGETS.map(v => `<button data-jt="${v}" class="${state.journey.target === v ? 'on' : ''}">${v}</button>`).join('')}</div></div>
+      <div class="stat" style="margin:4px 0 10px">Reise ${state.journey.n + 1} (${jTheme().name}): ${jProg()} von ${state.journey.target} ⭐ · ${state.journey.trophies.length} ${state.journey.trophies.length === 1 ? 'Reise' : 'Reisen'} geschafft</div>
+      <button class="btn sm ghost" id="jReset">Aktuelle Reise neu beginnen</button>
+    </div>
     <div class="card"><h3>⚙️ Einstellungen</h3>
       <div class="row"><div class="rl"><span>🔊</span>Töne</div><button class="switch ${state.settings.sound ? 'on' : ''}" id="sndSw" aria-label="Töne an/aus"></button></div>
       <div class="row"><div class="rl"><span>🎯</span>Tagesziel (Aufgaben)</div><div class="chips">${[10,20,30,40].map(v => `<button data-goal="${v}" class="${state.settings.dailyGoal === v ? 'on' : ''}">${v}</button>`).join('')}</div></div>
@@ -751,6 +861,10 @@ function viewEltern(){
   nameIn.oninput = () => { state.profile.name = nameIn.value.trim().slice(0, 20); save(); };
   $('#sndSw').onclick = e => { state.settings.sound = !state.settings.sound; e.currentTarget.classList.toggle('on', state.settings.sound); save(); sfx.tap(); };
   $('#expBtn').onclick = exportData;
+  $('#jReset').onclick = async () => {
+    if(!await confirmBox('Reise neu beginnen?', `${heroInfo().Der} startet wieder am Anfang der Karte. Sterne und Sticker bleiben erhalten.`, 'Neu beginnen', 'Abbrechen')) return;
+    state.journey.start = state.stars; state.journey.seen = 0; save(); toast('🗺️ Die Reise beginnt von vorn'); viewEltern();
+  };
   $('#impBtn').onclick = () => $('#importFile').click();
   $('#resetBtn').onclick = async () => {
     if(!await confirmBox('Wirklich alles löschen?', 'Sterne, Sticker und Statistik gehen verloren. Tipp: Vorher ein Backup exportieren.', 'Weiter', 'Abbrechen', true)) return;
@@ -769,8 +883,12 @@ view.addEventListener('click', e => {
   const lv = e.target.closest('[data-lv]');
   if(lv){ const [id, l] = lv.dataset.lv.split(':'); state.games[id].level = +l; save();
     lv.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === lv)); sfx.tap(); return; }
+  const hb = e.target.closest('[data-hero]');
+  if(hb){ state.journey.hero = hb.dataset.hero; save(); sfx.tap(); viewEltern(); return; }
+  const jt = e.target.closest('[data-jt]');
+  if(jt){ state.journey.target = +jt.dataset.jt; save(); sfx.tap(); viewEltern(); return; }
   const gl = e.target.closest('[data-goal]');
-  if(gl){ state.settings.dailyGoal = +gl.dataset.goal; save(); gl.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === gl)); sfx.tap(); }
+  if(gl){ state.settings.dailyGoal = +gl.dataset.goal; save(); sfx.tap(); viewEltern(); }
 });
 
 async function exportData(){
@@ -803,19 +921,231 @@ $('#importFile').addEventListener('change', async e => {
 /* ---------- Onboarding ---------- */
 function onboarding(){
   if(state.profile.onboarded) return;
-  let av = state.profile.avatar;
+  let av = state.profile.avatar, hero = state.journey.hero;
   const m = modal(`<div class="mbig">🦊</div><h2>Hallo! Ich bin der Rechenfuchs.</h2><p>Wie heißt du? Und welche Spielfigur möchtest du sein?</p>
     <div class="field"><input id="obName" maxlength="20" placeholder="Dein Name" autocomplete="off"></div>
     <div class="avs" style="justify-content:center;margin-bottom:16px">${AVATARS.map(a => `<button data-oav="${a}" class="${a === av ? 'on' : ''}">${a}</button>`).join('')}</div>
+    <p class="oblabel">Wer soll zum Märchenschloss reisen?</p>${heroSel(hero)}
     <div class="btnrow"><button class="btn" data-ob style="--ga:var(--fox)">Los geht's!</button></div>`);
   m.el.onclick = e => {
     const b = e.target.closest('[data-oav]');
     if(b){ av = b.dataset.oav; m.el.querySelectorAll('[data-oav]').forEach(x => x.classList.toggle('on', x === b)); sfx.tap(); return; }
+    const hs = e.target.closest('[data-hsel]');
+    if(hs){ hero = hs.dataset.hsel; m.el.querySelectorAll('[data-hsel]').forEach(x => x.classList.toggle('on', x === hs)); sfx.tap(); return; }
     if(e.target.closest('[data-ob]')){
+      if(!hero){ const h = m.el.querySelector('.herosel'); bounce(h, 'nudge'); sfx.bad(); return; }
+      state.journey.hero = hero;
       state.profile.name = $('#obName').value.trim().slice(0, 20); state.profile.avatar = av; state.profile.onboarded = true;
       save(); m.close(); sfx.ok(); renderView();
     }
   };
+}
+
+/* =========================================================
+   Reise zum Schloss (Gesamtziel, ca. 1 Woche)
+   ========================================================= */
+const heroInfo = () => HEROES[state.journey.hero || 'king'];
+const jTheme = (n = state.journey.n) => THEMES[n % THEMES.length];
+const jProg = () => Math.max(0, Math.min(state.journey.target, state.stars - state.journey.start));
+const jArrived = () => state.stars - state.journey.start >= state.journey.target;
+const jThr = () => OBS_F.map(f => Math.round(f * state.journey.target));
+let mapToken = 0, CURVE = null;
+
+function mulberry(a){ return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* Weg als weiche Kurve (Catmull-Rom -> Bezier), mit eigener Längenmessung */
+function curve(){
+  if(CURVE) return CURVE;
+  const P = WAY; let d = `M${P[0][0]} ${P[0][1]}`; const sm = [];
+  for(let i = 0; i < P.length - 1; i++){
+    const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2;
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0]} ${p2[1]}`;
+    for(let k = i ? 1 : 0; k <= 40; k++){
+      const t = k / 40, u = 1 - t, a = u * u * u, b = 3 * u * u * t, c = 3 * u * t * t, e = t * t * t;
+      sm.push([a * p1[0] + b * c1[0] + c * c2[0] + e * p2[0], a * p1[1] + b * c1[1] + c * c2[1] + e * p2[1]]);
+    }
+  }
+  const cum = [0];
+  for(let i = 1; i < sm.length; i++) cum.push(cum[i - 1] + Math.hypot(sm[i][0] - sm[i - 1][0], sm[i][1] - sm[i - 1][1]));
+  const L = cum[cum.length - 1];
+  const at = f => {
+    const t = Math.max(0, Math.min(1, f)) * L; let lo = 0, hi = cum.length - 1;
+    while(hi - lo > 1){ const mid = (lo + hi) >> 1; if(cum[mid] < t) lo = mid; else hi = mid; }
+    const seg = cum[hi] - cum[lo] || 1, r = (t - cum[lo]) / seg;
+    return {x: sm[lo][0] + (sm[hi][0] - sm[lo][0]) * r, y: sm[lo][1] + (sm[hi][1] - sm[lo][1]) * r};
+  };
+  return CURVE = {d, sm, L, at};
+}
+
+/* Das Märchenschloss (lokale Koordinaten 0..180 x -38..150, Boden bei y=150) */
+function castleSVG(open){
+  const W = '#FFF6FB', ST = '#DDB1CD', R1 = '#8B5CF6', R2 = '#EC4899', F = '#FFC93C', WIN = open ? '#FFE07A' : '#7C5AA6';
+  const flag = (x, y) => `<line x1="${x}" y1="${y}" x2="${x}" y2="${y - 16}" stroke="#7A5A3A" stroke-width="2"/><path d="M${x} ${y - 16} L${x + 15} ${y - 12} L${x} ${y - 8}Z" fill="${F}"/>`;
+  const win = (x, y, w, h) => `<path d="M${x} ${y + h} V${y + w / 2} A${w / 2} ${w / 2} 0 0 1 ${x + w} ${y + w / 2} V${y + h}Z" fill="${WIN}" stroke="${ST}" stroke-width="1.5"/>`;
+  const cren = (x1, x2, y) => { let r = ''; for(let x = x1; x <= x2 - 6; x += 11) r += `<rect x="${x}" y="${y - 8}" width="6.5" height="9" fill="${W}" stroke="${ST}" stroke-width="1.2"/>`; return r; };
+  const roof = (x1, top, x2, y, col) => `<path d="M${x1} ${y} L${(x1 + x2) / 2} ${top} L${x2} ${y}Z" fill="${col}"/><path d="M${(x1 + x2) / 2} ${top} L${x2} ${y} L${(x1 + x2) / 2 + (x2 - x1) * .12} ${y}Z" fill="#000" opacity=".12"/>`;
+  return `<g class="castle">
+    ${open ? `<g opacity=".75">${['#FF8FB1', '#FFC93C', '#7FD7A8', '#7CC4FF', '#B794F6'].map((c, i) => `<path d="M${-6 + i * 7} 150 A${96 - i * 7} ${96 - i * 7} 0 0 1 ${186 - i * 7} 150" fill="none" stroke="${c}" stroke-width="7"/>`).join('')}</g>` : ''}
+    <rect x="12" y="52" width="36" height="98" fill="${W}" stroke="${ST}" stroke-width="2"/>${roof(5, 4, 55, 54, R2)}${flag(30, 4)}
+    ${win(23, 78, 14, 20)}${win(23, 114, 14, 18)}
+    <rect x="132" y="52" width="36" height="98" fill="${W}" stroke="${ST}" stroke-width="2"/>${roof(125, 4, 175, 54, R2)}${flag(150, 4)}
+    ${win(143, 78, 14, 20)}${win(143, 114, 14, 18)}
+    <rect x="44" y="74" width="92" height="76" fill="${W}" stroke="${ST}" stroke-width="2"/>${cren(44, 136, 74)}
+    <rect x="70" y="30" width="40" height="46" fill="${W}" stroke="${ST}" stroke-width="2"/>${roof(62, -22, 118, 33, R1)}${flag(90, -22)}
+    ${win(84, 42, 12, 18)}${win(54, 86, 11, 16)}${win(115, 86, 11, 16)}
+    <path d="M90 92 c-3 -6 -12 -3 -8 4 l8 7 l8 -7 c4 -7 -5 -10 -8 -4z" fill="${R2}"/>
+    <path d="M74 150 V126 A16 16 0 0 1 106 126 V150Z" fill="${open ? '#FFE9A8' : '#8A5A3B'}" stroke="#6B4226" stroke-width="2"/>
+    ${open ? '' : '<line x1="90" y1="110" x2="90" y2="150" stroke="#6B4226" stroke-width="2"/><circle cx="85" cy="133" r="1.8" fill="#FFC93C"/><circle cx="95" cy="133" r="1.8" fill="#FFC93C"/>'}
+    <ellipse cx="20" cy="150" rx="14" ry="7" fill="#4FA35B"/><ellipse cx="160" cy="150" rx="14" ry="7" fill="#4FA35B"/>
+    <text x="14" y="146" font-size="9">🌸</text><text x="156" y="146" font-size="9">🌸</text>
+  </g>`;
+}
+
+function mapSVG(th, H, arrived){
+  const C = curve(), rng = mulberry(th.key.length * 977 + th.key.charCodeAt(0));
+  const obsPts = OBS_F.map(f => C.at(f));
+  const ri = th.obs.findIndex(o => o.river), ry = ri >= 0 ? obsPts[ri].y : -999;
+  const T = (x, y, size, e, cls = '') => `<text ${cls ? `class="${cls}"` : ''} x="${x.toFixed ? x.toFixed(1) : x}" y="${y.toFixed ? y.toFixed(1) : y}" font-size="${size}" text-anchor="middle" dominant-baseline="central">${e}</text>`;
+  let hills = '';
+  for(let i = 0; i < 8; i++){ const x = rng() * 360, y = 250 + rng() * 480;
+    hills += `<ellipse cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" rx="${(55 + rng() * 55).toFixed(0)}" ry="${(18 + rng() * 18).toFixed(0)}" fill="${th.hill}" opacity=".45"/>`; }
+  let deco = ''; const used = [];
+  for(let k = 0; k < 600 && used.length < 40; k++){
+    const x = 14 + rng() * 332, y = 24 + rng() * 716;
+    if(y < 232 && x > 62 && x < 298) continue;
+    if(Math.abs(y - ry) < 28) continue;
+    if(C.sm.some((p, i) => i % 5 === 0 && Math.hypot(p[0] - x, p[1] - y) < 32)) continue;
+    if(obsPts.some(p => Math.hypot(p.x - x, p.y - y) < 46)) continue;
+    if(used.some(p => Math.hypot(p[0] - x, p[1] - y) < 26)) continue;
+    if(Math.hypot(x - 32, y - 724) < 40) continue;
+    used.push([x, y]);
+    deco += T(x, y, (16 + rng() * 12).toFixed(0), th.decor[Math.floor(rng() * th.decor.length)]);
+  }
+  const wave = `M-10 ${ry} C 60 ${ry - 16}, 120 ${ry + 16}, 180 ${ry} S 300 ${ry - 16}, 370 ${ry}`;
+  const river = ri < 0 ? '' : `<path d="${wave}" fill="none" stroke="${th.river}" stroke-width="30" stroke-linecap="round"/><path d="${wave}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2.5" stroke-dasharray="10 14"/>`;
+  const obs = th.obs.map((o, i) => {
+    const p = obsPts[i], w = o.n.length * 5.7 + 16, lx = Math.max(4 + w / 2, Math.min(356 - w / 2, p.x));
+    return `<g class="ob" data-i="${i}"><circle class="obc" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="21" fill="#fff" fill-opacity=".96" stroke="${th.accent}" stroke-width="3"/>
+      ${T(p.x, p.y + 1, 22, o.e, 'obe')}
+      <rect x="${(lx - w / 2).toFixed(1)}" y="${(p.y + 24).toFixed(1)}" width="${w.toFixed(1)}" height="18" rx="9" fill="#fff" fill-opacity=".93"/>
+      <text x="${lx.toFixed(1)}" y="${(p.y + 33.5).toFixed(1)}" font-size="10.5" font-weight="800" fill="#2B2140" text-anchor="middle" dominant-baseline="central">${o.n}</text>
+      <g class="chk"><circle cx="${(p.x + 16).toFixed(1)}" cy="${(p.y - 16).toFixed(1)}" r="9" fill="#1FAF6A" stroke="#fff" stroke-width="2"/><path d="M${(p.x + 11.5).toFixed(1)} ${(p.y - 16).toFixed(1)} l3 3 l5.5 -6" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></g>`;
+  }).join('');
+  const waitBubble = arrived
+    ? `${T(146, 150, 18, '💕', 'twk')}${T(216, 150, 18, '💕', 'twk')}${T(110, 100, 16, '✨', 'twk')}${T(250, 96, 16, '✨', 'twk')}${T(180, 4 + 14, 14, '✨', 'twk')}`
+    : `<g class="wait"><rect x="198" y="158" width="100" height="26" rx="13" fill="#fff" stroke="${th.accent}" stroke-width="2"/><text x="248" y="171.5" font-size="11.5" font-weight="800" fill="#2B2140" text-anchor="middle" dominant-baseline="central">Ich warte! 💕</text></g>`;
+  return `<svg id="jmap" viewBox="0 0 360 760" role="img" aria-label="Karte der Reise zum Schloss">
+    <defs><linearGradient id="jbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${th.bg[0]}"/><stop offset="1" stop-color="${th.bg[1]}"/></linearGradient></defs>
+    <rect width="360" height="760" fill="url(#jbg)"/>
+    ${T(40, 40, 30, '☁️')}${T(326, 70, 26, '☁️')}${T(300, 26, 20, '☁️')}
+    ${hills}${river}
+    <ellipse cx="180" cy="196" rx="138" ry="28" fill="${th.hill}"/>
+    ${deco}
+    <path d="${C.d}" fill="none" stroke="${th.trail}" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${C.d}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>
+    <path id="jprog" d="${C.d}" pathLength="1000" fill="none" stroke="#FFC93C" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 1001"/>
+    ${T(32, 722, 30, '🏡')}<rect x="10" y="740" width="44" height="17" rx="8.5" fill="#fff" fill-opacity=".93"/><text x="32" y="749" font-size="10.5" font-weight="900" fill="#2B2140" text-anchor="middle" dominant-baseline="central">START</text>
+    ${obs}
+    <g transform="translate(90 44)">${castleSVG(arrived)}</g>
+    ${T(180, 178, 28, H.p)}
+    ${waitBubble}
+    <g id="jhero"><ellipse cx="0" cy="22" rx="16" ry="5" fill="#000" opacity=".18"/><g class="hbob"><circle r="22" fill="#fff" stroke="#FFC93C" stroke-width="4"/>${T(0, 1, 27, H.e)}</g></g>
+  </svg>`;
+}
+
+function viewReise(){
+  const J = state.journey, th = jTheme(), H = heroInfo(), T = J.target, prog = jProg(), arrived = jArrived(), thr = jThr();
+  const ni = thr.findIndex(t => prog < t);
+  const next = arrived ? `🎉 ${H.Der} ist im Schloss angekommen!`
+    : ni >= 0 ? `Nächstes Hindernis: ${th.obs[ni].e} <b>${th.obs[ni].n}</b> – noch ${thr[ni] - prog} ⭐`
+    : `Gleich geschafft! Noch ${T - prog} ⭐ bis zum Schloss`;
+  view.innerHTML = `<div class="card jhead"><div class="jt1">Reise ${J.n + 1} · ${th.name}</div><h2>${th.title}</h2>
+      <div class="jsub">Bring ${H.akk} ${H.pDat} ins Märchenschloss! Jede richtige Antwort ist ein Schritt.</div>
+      <div class="bar jbar"><i style="width:${prog / T * 100}%"></i></div>
+      <div class="jnext">⭐ ${prog} / ${T} · ${next}</div></div>
+    <div class="mapwrap">${mapSVG(th, H, arrived)}</div>
+    ${J.trophies.length ? `<h2 class="sec">Geschaffte Reisen</h2><div class="card trow">${J.trophies.map(t => `<span>${t}</span>`).join('')}</div>` : ''}`;
+  setupMap();
+  if(!J.hero) setTimeout(heroPicker, 300);
+}
+
+function setupMap(){
+  const tok = mapToken, J = state.journey, T = J.target, prog = jProg(), C = curve(), thr = jThr(), th = jTheme();
+  const svg = $('#jmap'); if(!svg) return;
+  const hero = svg.querySelector('#jhero'), pp = svg.querySelector('#jprog'), obs = [...svg.querySelectorAll('.ob')];
+  const place = v => { const f = v / T, p = C.at(f);
+    hero.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
+    pp.setAttribute('stroke-dasharray', `${(f * 1000).toFixed(1)} 1001`); };
+  const mark = v => obs.forEach((o, i) => { const done = v >= thr[i]; o.classList.toggle('done', done);
+    o.querySelector('.obe').textContent = done ? (th.obs[i].after || th.obs[i].e) : th.obs[i].e; });
+  const from = Math.min(J.seen, prog);
+  place(from); mark(from);
+  const r0 = hero.getBoundingClientRect();
+  window.scrollTo(0, Math.max(0, window.scrollY + r0.top - window.innerHeight * .62));
+  const finish = () => { J.seen = prog; save(); if(jArrived()) setTimeout(() => { if(tok === mapToken) celebrate(); }, 700); };
+  if(prog <= from){ finish(); return; }
+  setTimeout(() => {
+    if(tok !== mapToken) return;
+    const dur = Math.min(4500, 900 + (prog - from) * 70), t0 = performance.now(); let lastV = from, lastStep = 0;
+    const frame = now => {
+      if(tok !== mapToken || !document.body.contains(svg)) return;
+      const t = Math.min(1, (now - t0) / dur), e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const v = from + (prog - from) * e;
+      thr.forEach((x, i) => { if(lastV < x && v >= x){ sfx.ok(); toast(`${th.obs[i].after || th.obs[i].e} Geschafft! ${th.obs[i].ok}`); } });
+      if(now - lastStep > 260){ sfx.step(); lastStep = now; }
+      place(v); mark(v); lastV = v;
+      const r = hero.getBoundingClientRect();
+      if(r.top < window.innerHeight * .3) window.scrollTo(0, window.scrollY + r.top - window.innerHeight * .3);
+      if(t < 1) requestAnimationFrame(frame); else finish();
+    };
+    requestAnimationFrame(frame);
+  }, 650);
+}
+
+function celebrate(){
+  if(document.querySelector('.mbg.celeb') || !jArrived()) return;
+  const th = jTheme(), H = heroInfo();
+  sfx.win(); confetti(90, ['🎆','🎇','✨','💖','👑','⭐','🎉']);
+  setTimeout(() => confetti(60, ['💕','✨','🎆','🌟','👑']), 1500);
+  const m = modal(`<svg class="celsvg" viewBox="-10 -44 200 236" aria-hidden="true">${castleSVG(true)}
+      <ellipse cx="90" cy="176" rx="100" ry="22" fill="#9BD98A"/>
+      <text x="62" y="170" font-size="40" text-anchor="middle" dominant-baseline="central">${H.e}</text>
+      <text x="118" y="170" font-size="40" text-anchor="middle" dominant-baseline="central">${H.p}</text>
+      <text class="twk" x="90" y="146" font-size="22" text-anchor="middle" dominant-baseline="central">💕</text></svg>
+    <h2>Angekommen! 🎉</h2><p>${H.Der} ist endlich im Märchenschloss! ${H.pDie} hat schon gewartet. Jetzt wird ein großes Schlossfest gefeiert!</p>
+    <div class="trophy">Neuer Reise-Pokal: <span>${th.trophy}</span></div>
+    <div class="btnrow"><button class="btn" data-newj style="--ga:#8B5CF6">Neue Reise starten ➜</button></div>`);
+  m.el.classList.add('celeb');
+  m.el.querySelector('[data-newj]').onclick = () => {
+    const J = state.journey; J.trophies.push(th.trophy); J.start += J.target; J.n++; J.seen = 0; save();
+    m.close(); sfx.sticker(); tab = 'reise'; window.scrollTo(0, 0); renderView();
+    toast(`🗺️ Neue Reise: ${jTheme().title}!`, 3200);
+  };
+}
+
+const heroSel = cur => `<div class="herosel">${['king', 'queen'].map(k => `<button data-hsel="${k}" class="${cur === k ? 'on' : ''}"><span>${HEROES[k].e}</span>${HEROES[k].name}<small>${HEROES[k].pDie} wartet im Schloss</small></button>`).join('')}</div>`;
+function heroPicker(){
+  if(document.querySelector('.mbg.hpick') || state.journey.hero) return;
+  const m = modal(`<div class="mbig">🏰</div><h2>Neu: Die Reise zum Schloss!</h2><p>Mit jeder richtigen Antwort kommt deine Figur dem Märchenschloss ein Stück näher. Wer soll reisen?</p>${heroSel(null)}`);
+  m.el.classList.add('hpick');
+  m.el.onclick = e => { const b = e.target.closest('[data-hsel]'); if(!b) return;
+    state.journey.hero = b.dataset.hsel; save(); sfx.ok(); m.close(); renderView(); };
+}
+
+function journeyMini(){
+  const J = state.journey, H = heroInfo(), T = J.target, prog = jProg(), pct = prog / T * 100, thr = jThr();
+  const txt = jArrived() ? `${H.Der} ist angekommen! Tippe hier zum Feiern 🎉` : `Noch ${T - prog} ⭐ bis ${H.pDat} ins Schloss`;
+  return `<button class="card jmini" data-goreise><div class="gr"><span>🏰 Reise zum Schloss</span><span>${prog} / ${T} ⭐</span></div>
+    <div class="jtrack"><i style="width:${pct}%"></i>${thr.map(t => `<b class="jt ${prog >= t ? 'on' : ''}" style="left:${t / T * 100}%"></b>`).join('')}<span class="jhero" style="left:${pct}%">${H.e}</span><span class="jcastle">🏰</span></div>
+    <div class="small">${txt}</div></button>`;
+}
+
+function jLine(n){
+  if(!n) return '';
+  const H = heroInfo();
+  return jArrived() ? `<div class="jline">🏰 ${H.Der} ist am Schloss angekommen!</div>`
+    : `<div class="jline">${H.e} ${H.Der} ist ${n} ${n === 1 ? 'Schritt' : 'Schritte'} näher am Schloss!</div>`;
 }
 
 /* =========================================================
@@ -831,7 +1161,8 @@ function newSession(id){
 function exitGame(){
   if(cur) cur.alive = false; cur = null; keyHandler = null;
   layer.hidden = true; layer.innerHTML = ''; document.body.style.overflow = '';
-  renderView();
+  if(jArrived()) tab = 'reise';
+  window.scrollTo(0, 0); renderView();
 }
 layer.addEventListener('click', async e => {
   if(!e.target.closest('[data-exit]')) return;
@@ -957,12 +1288,13 @@ function endScreen(s, g, o){
   const body = layer.querySelector('.g-body'); body.onclick = null;
   body.className = 'g-body scroll end';
   body.innerHTML = `<div class="ebig">${o.big}</div><h1>${o.title}</h1><p>${o.text}</p>
-    <div class="estars">+${s.stars} ⭐</div>${o.extra || ''}
-    <button class="btn big" data-again>Nochmal spielen</button><button class="btn big ghost" data-home>Zur Übersicht</button>`;
+    <div class="estars">+${s.stars} ⭐</div>${jLine(s.stars)}${o.extra || ''}
+    <button class="btn big" data-again>Nochmal spielen</button>${s.stars ? `<button class="btn big ghost" data-map>🗺️ Zur Schloss-Karte</button>` : ''}<button class="btn big ghost" data-home>Zur Übersicht</button>`;
   if(o.win){ sfx.win(); confetti(); }
   body.onclick = e => {
     if(e.target.closest('[data-again]')){ sfx.tap(); o.again(); }
-    else if(e.target.closest('[data-home]')){ sfx.tap(); exitGame(); }
+    else if(e.target.closest('[data-map]')){ sfx.tap(); tab = 'reise'; exitGame(); }
+    else if(e.target.closest('[data-home]')){ sfx.tap(); tab = 'home'; exitGame(); }
   };
 }
 
@@ -1384,7 +1716,7 @@ async function runKuerbis(s, g, level, mode){
 
 /* ---------- Start ---------- */
 renderView();
-setTimeout(onboarding, 400);
+setTimeout(() => { if(!state.profile.onboarded) onboarding(); else if(!state.journey.hero) heroPicker(); }, 400);
 if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
 }
