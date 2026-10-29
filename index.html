@@ -349,12 +349,22 @@ h1,h2,h3,p{margin:0}
 #jmap{display:block;width:100%;height:auto;font-family:var(--font)}
 #jmap .chk{opacity:0;transition:opacity .3s}
 #jmap .ob.done .chk{opacity:1}
-#jmap .ob.done .obc{stroke:#1FAF6A}
+#jmap .ob .ringd{opacity:0;transition:opacity .4s}
+#jmap .ob.done .ringd{opacity:1}
+#jmap .ob .aft{opacity:0;transition:opacity .6s}
+#jmap .ob.done .aft{opacity:1}
+#jmap .cloud{animation:drift 9s ease-in-out infinite alternate}
+#jmap .flow{animation:flow 2.2s linear infinite}
+.smoke{animation:smoke 3.2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.smoke.s2{animation-delay:1.6s}
+@keyframes drift{from{transform:translateX(-7px)}to{transform:translateX(9px)}}
+@keyframes flow{to{stroke-dashoffset:-28}}
+@keyframes smoke{0%{opacity:0;transform:translate(0,4px) scale(.6)}25%{opacity:.85}100%{opacity:0;transform:translate(7px,-16px) scale(1.6)}}
 .hbob{animation:hbob 1.4s ease-in-out infinite}
 .twk{animation:twk 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 .wait{animation:hbob 2.4s ease-in-out infinite}
 .trow{display:flex;flex-wrap:wrap;gap:10px;font-size:34px}
-.celsvg{width:100%;max-width:280px;display:block;margin:-8px auto 2px}
+.celsvg{width:100%;max-width:300px;display:block;margin:-8px auto 2px}
 .trophy{font-weight:800;margin:0 0 14px;display:flex;align-items:center;justify-content:center;gap:8px}
 .trophy span{font-size:34px}
 .herosel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
@@ -439,7 +449,7 @@ h1,h2,h3,p{margin:0}
    Rechenfuchs – Mathe-Spiele für die 2. Klasse
    Alle Daten bleiben lokal im Gerät (localStorage).
    ========================================================= */
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const KEY = 'rechenfuchs.v1';
 const SCHEMA = 2;
 const STARS_PER_STICKER = 15;
@@ -494,36 +504,52 @@ const JOURNEY_TARGETS = [80, 120, 160, 200];
 const OBS_F = [.13, .29, .45, .6, .75, .9];
 const GATE = {e:'🔒', n:'Das Schlosstor', ok:'Das Schlosstor ist offen!', after:'🔓'};
 const THEMES = [
-  {key:'wald', name:'Märchenwald', title:'Durch den Märchenwald', bg:['#CFEFB8','#86CB72'], hill:'#6DBB5C', trail:'#F1DDAE', river:'#4FB3E8', accent:'#2F8F46', trophy:'🌳',
-   decor:['🌳','🌲','🌼','🍄','🌷','🦋','🐇','🌳','🌻','🐿️'],
-   obs:[{e:'🌲', n:'Der dunkle Wald', ok:'Durch den dunklen Wald!'},
+  {key:'wald', name:'Märchenwald', title:'Durch den Märchenwald', trophy:'🌳',
+   sky:['#86CCFF','#E6F7FF'], mtn:['#B9D4EE','#8DB3D8'], caps:true, sun:true, rock:'#A9A5B8',
+   land:['#AEE08F','#6CBA5A'], patch:['#94D27A','#C2EAA6'], tex:'grass', texc:'#4E9A3F',
+   tree:'round', treeC:['#8BDB76','#3F9D47'], pineC:['#5DB760','#2C7A45'], hill:'#7FCB6C',
+   trail:'#F6E2B8', trailEdge:'#C9A273', river:'#4FB0EE', bank:'#E8D6A2', plank:'#B9844F', accent:'#2F8F46',
+   lake:{c:'#62BDF0', e:'🦆'}, critters:['🐇','🦋','🐿️','🦌','🐞','🦔','🍄','🐝'], flowers:['#FF6FA5','#FFD43B','#FFFFFF','#B07CFF'],
+   obs:[{e:'🌲', n:'Der dunkle Wald', ok:'Durch den dunklen Wald!', scene:'forest'},
         {e:'🌊', n:'Der wilde Fluss', ok:'Über den wilden Fluss!', after:'🌉', river:true},
-        {e:'🐸', n:'Der Froschsumpf', ok:'Durch den Froschsumpf!'},
-        {e:'⛰️', n:'Der hohe Berg', ok:'Über den hohen Berg!'},
-        {e:'🐉', n:'Der kleine Drache', ok:'Der Drache ist jetzt ein Freund!', after:'💚'}, GATE]},
-  {key:'winter', name:'Winterland', title:'Durch das Winterland', bg:['#F3FAFF','#BCDCF4'], hill:'#FFFFFF', trail:'#DDE8F3', river:'#A9DDF5', accent:'#3B82C4', trophy:'⛄',
-   decor:['🌲','❄️','⛄','🐧','🦌','🌲','🐻‍❄️','❄️'],
-   obs:[{e:'⛄', n:'Das Schneemann-Feld', ok:'Vorbei am Schneemann-Feld!'},
+        {e:'🐸', n:'Der Froschsumpf', ok:'Durch den Froschsumpf!', scene:'swamp', sc:'#7FA04A', extra:'🐸'},
+        {e:'⛰️', n:'Der hohe Berg', ok:'Über den hohen Berg!', scene:'mountain', sc:['#A3AFBD','#FFFFFF']},
+        {e:'🐉', n:'Der kleine Drache', ok:'Der Drache ist jetzt ein Freund!', after:'💚', scene:'cave'}, GATE]},
+  {key:'winter', name:'Winterland', title:'Durch das Winterland', trophy:'⛄',
+   sky:['#AFCFEF','#EEF6FD'], mtn:['#DDE9F6','#B2CAE3'], caps:true, sun:false, rock:'#B7C3D6',
+   land:['#F7FBFF','#D3E4F5'], patch:['#E3EDF9','#FFFFFF'], tex:'snow', texc:'#9DB9D6',
+   tree:'snowpine', treeC:['#62B08E','#2D6E5A'], pineC:['#62B08E','#2D6E5A'], hill:'#FFFFFF',
+   trail:'#E8EFF8', trailEdge:'#AFC4DA', river:'#93D3F2', bank:'#FFFFFF', plank:'#9FB7CF', accent:'#3B82C4',
+   lake:{c:'#CBEAF8', e:'⛸️'}, critters:['🐧','🦌','🐻‍❄️','🦊','🐇','🦉'], flowers:['#FFFFFF','#D6ECFF'],
+   obs:[{e:'⛄', n:'Das Schneemann-Feld', ok:'Vorbei am Schneemann-Feld!', scene:'snow', extra:'⛄'},
         {e:'🧊', n:'Der Eissee', ok:'Über den glatten Eissee!', after:'⛸️', river:true},
-        {e:'🌨️', n:'Der Schneesturm', ok:'Der Schneesturm ist vorbei!', after:'🌤️'},
-        {e:'🏔️', n:'Der Gletscher', ok:'Über den Gletscher!'},
-        {e:'🐺', n:'Der Wolf', ok:'Der Wolf wollte nur spielen!', after:'🐶'}, GATE]},
-  {key:'insel', name:'Zauberinsel', title:'Über die Zauberinsel', bg:['#FFF4D2','#F4D38C'], hill:'#8FD8B8', trail:'#FFF8E8', river:'#2EB5D6', accent:'#0E9AA7', trophy:'🏝️',
-   decor:['🌴','🐚','🌺','🐢','🦜','🌴','🦩','🐠'],
-   obs:[{e:'🌴', n:'Der Palmendschungel', ok:'Durch den Palmendschungel!'},
+        {e:'🌨️', n:'Der Schneesturm', ok:'Der Schneesturm ist vorbei!', after:'🌤️', scene:'snow'},
+        {e:'🏔️', n:'Der Gletscher', ok:'Über den Gletscher!', scene:'mountain', sc:['#BCD4EC','#FFFFFF']},
+        {e:'🐺', n:'Der Wolf', ok:'Der Wolf wollte nur spielen!', after:'🐶', scene:'forest'}, GATE]},
+  {key:'insel', name:'Zauberinsel', title:'Über die Zauberinsel', trophy:'🏝️',
+   sky:['#62CBF4','#E4FAFF'], mtn:['#8ED6C4','#4FB39C'], caps:false, sun:true, rock:'#C9A27A',
+   land:['#FDEEC6','#F0C97A'], patch:['#A6DFB6','#F8DFA5'], tex:'sand', texc:'#D4A85A',
+   tree:'palm', treeC:['#45C672','#23934C'], pineC:['#45C672','#23934C'], hill:'#9EDCAF',
+   trail:'#FFF8E6', trailEdge:'#D7AE68', river:'#22B0D8', bank:'#FFF1C9', plank:'#A9783F', accent:'#0E9AA7', wideRiver:true,
+   lake:{c:'#3CC6E0', e:'🐠'}, critters:['🐢','🦜','🦩','🦀','🐚','🦋'], flowers:['#FF5C8A','#FFB020','#FF7A1A'],
+   obs:[{e:'🌴', n:'Der Palmendschungel', ok:'Durch den Palmendschungel!', scene:'forest'},
         {e:'⛵', n:'Das große Meer', ok:'Mit dem Boot übers Meer!', river:true},
-        {e:'🦀', n:'Der Krabbenstrand', ok:'Vorbei an den Krabben!'},
-        {e:'🌋', n:'Der Vulkan', ok:'Am Vulkan vorbei!'},
-        {e:'🐙', n:'Der Riesenkrake', ok:'Der Krake winkt zum Abschied!', after:'👋'}, GATE]},
-  {key:'zucker', name:'Zuckerland', title:'Durch das Zuckerland', bg:['#FFEAF4','#FFC4DF'], hill:'#FFD9AE', trail:'#FFFFFF', river:'#8B5A2B', accent:'#E0457B', trophy:'🍭',
-   decor:['🍭','🍬','🧁','🍩','🍦','🍪','🍓','🍬'],
-   obs:[{e:'🍭', n:'Der Lolli-Wald', ok:'Durch den Lolli-Wald!'},
+        {e:'🦀', n:'Der Krabbenstrand', ok:'Vorbei an den Krabben!', scene:'swamp', sc:'#8FD9EA', extra:'🦀'},
+        {e:'🌋', n:'Der Vulkan', ok:'Am Vulkan vorbei!', scene:'mountain', sc:['#8C5A44','#FF6B2C'], lava:true},
+        {e:'🐙', n:'Der Riesenkrake', ok:'Der Krake winkt zum Abschied!', after:'👋', scene:'swamp', sc:'#2FB4D9'}, GATE]},
+  {key:'zucker', name:'Zuckerland', title:'Durch das Zuckerland', trophy:'🍭',
+   sky:['#FFBFE0','#FFF0F8'], mtn:['#FFC6E0','#F59AC6'], caps:true, sun:false, rock:'#E9B97A',
+   land:['#FFE8F2','#FFC4DE'], patch:['#FFF3C9','#D7F4E5'], tex:'sprinkle', texc:'#F06BA8',
+   tree:'lolli', treeC:['#FF7EB6','#8B5CF6'], pineC:['#FF7EB6','#8B5CF6'], hill:'#FFD9AE',
+   trail:'#FFFFFF', trailEdge:'#F5A3C7', river:'#8B5A2B', bank:'#F7D1A8', plank:'#F472B6', accent:'#E0457B',
+   lake:{c:'#FFF8EE', e:'🍓'}, critters:['🐝','🦄','🍪','🧁','🍩','🍬'], flowers:['#FF5FA2','#7BD3F7','#FFE066','#9B7BFF'],
+   obs:[{e:'🍭', n:'Der Lolli-Wald', ok:'Durch den Lolli-Wald!', scene:'forest'},
         {e:'🍫', n:'Der Schokofluss', ok:'Über den Schokoladenfluss!', after:'🌉', river:true},
-        {e:'🍯', n:'Der Honigsumpf', ok:'Raus aus dem klebrigen Honig!'},
-        {e:'🎂', n:'Der Tortenberg', ok:'Über den Tortenberg!'},
-        {e:'🐝', n:'Die Bienenwiese', ok:'Die Bienen summen fröhlich!', after:'🌸'}, GATE]}
+        {e:'🍯', n:'Der Honigsumpf', ok:'Raus aus dem klebrigen Honig!', scene:'swamp', sc:'#F2B33D'},
+        {e:'🎂', n:'Der Tortenberg', ok:'Über den Tortenberg!', scene:'mountain', sc:['#FF9EC7','#FFFFFF']},
+        {e:'🐝', n:'Die Bienenwiese', ok:'Die Bienen summen fröhlich!', after:'🌸', scene:'flowers', extra:'🐝'}, GATE]}
 ];
-const WAY = [[60,712],[190,700],[300,652],[282,578],[160,548],[68,494],[86,420],[216,392],[300,334],[262,276],[140,258],[180,212]];
+const WAY = [[60,782],[190,770],[300,722],[282,648],[160,618],[68,564],[86,490],[216,462],[300,404],[262,346],[140,328],[180,284]];
 const HEROES = {
   king:  {e:'🤴', p:'👸', name:'König',   Der:'Der König',   akk:'den König',   pDie:'Die Königin', pDat:'zur Königin'},
   queen: {e:'👸', p:'🤴', name:'Königin', Der:'Die Königin', akk:'die Königin', pDie:'Der König',   pDat:'zum König'}
@@ -978,79 +1004,353 @@ function curve(){
   return CURVE = {d, sm, L, at};
 }
 
-/* Das Märchenschloss (lokale Koordinaten 0..180 x -38..150, Boden bei y=150) */
-function castleSVG(open){
-  const W = '#FFF6FB', ST = '#DDB1CD', R1 = '#8B5CF6', R2 = '#EC4899', F = '#FFC93C', WIN = open ? '#FFE07A' : '#7C5AA6';
-  const flag = (x, y) => `<line x1="${x}" y1="${y}" x2="${x}" y2="${y - 16}" stroke="#7A5A3A" stroke-width="2"/><path d="M${x} ${y - 16} L${x + 15} ${y - 12} L${x} ${y - 8}Z" fill="${F}"/>`;
-  const win = (x, y, w, h) => `<path d="M${x} ${y + h} V${y + w / 2} A${w / 2} ${w / 2} 0 0 1 ${x + w} ${y + w / 2} V${y + h}Z" fill="${WIN}" stroke="${ST}" stroke-width="1.5"/>`;
-  const cren = (x1, x2, y) => { let r = ''; for(let x = x1; x <= x2 - 6; x += 11) r += `<rect x="${x}" y="${y - 8}" width="6.5" height="9" fill="${W}" stroke="${ST}" stroke-width="1.2"/>`; return r; };
-  const roof = (x1, top, x2, y, col) => `<path d="M${x1} ${y} L${(x1 + x2) / 2} ${top} L${x2} ${y}Z" fill="${col}"/><path d="M${(x1 + x2) / 2} ${top} L${x2} ${y} L${(x1 + x2) / 2 + (x2 - x1) * .12} ${y}Z" fill="#000" opacity=".12"/>`;
-  return `<g class="castle">
-    ${open ? `<g opacity=".75">${['#FF8FB1', '#FFC93C', '#7FD7A8', '#7CC4FF', '#B794F6'].map((c, i) => `<path d="M${-6 + i * 7} 150 A${96 - i * 7} ${96 - i * 7} 0 0 1 ${186 - i * 7} 150" fill="none" stroke="${c}" stroke-width="7"/>`).join('')}</g>` : ''}
-    <rect x="12" y="52" width="36" height="98" fill="${W}" stroke="${ST}" stroke-width="2"/>${roof(5, 4, 55, 54, R2)}${flag(30, 4)}
-    ${win(23, 78, 14, 20)}${win(23, 114, 14, 18)}
-    <rect x="132" y="52" width="36" height="98" fill="${W}" stroke="${ST}" stroke-width="2"/>${roof(125, 4, 175, 54, R2)}${flag(150, 4)}
-    ${win(143, 78, 14, 20)}${win(143, 114, 14, 18)}
-    <rect x="44" y="74" width="92" height="76" fill="${W}" stroke="${ST}" stroke-width="2"/>${cren(44, 136, 74)}
-    <rect x="70" y="30" width="40" height="46" fill="${W}" stroke="${ST}" stroke-width="2"/>${roof(62, -22, 118, 33, R1)}${flag(90, -22)}
-    ${win(84, 42, 12, 18)}${win(54, 86, 11, 16)}${win(115, 86, 11, 16)}
-    <path d="M90 92 c-3 -6 -12 -3 -8 4 l8 7 l8 -7 c4 -7 -5 -10 -8 -4z" fill="${R2}"/>
-    <path d="M74 150 V126 A16 16 0 0 1 106 126 V150Z" fill="${open ? '#FFE9A8' : '#8A5A3B'}" stroke="#6B4226" stroke-width="2"/>
-    ${open ? '' : '<line x1="90" y1="110" x2="90" y2="150" stroke="#6B4226" stroke-width="2"/><circle cx="85" cy="133" r="1.8" fill="#FFC93C"/><circle cx="95" cy="133" r="1.8" fill="#FFC93C"/>'}
-    <ellipse cx="20" cy="150" rx="14" ry="7" fill="#4FA35B"/><ellipse cx="160" cy="150" rx="14" ry="7" fill="#4FA35B"/>
-    <text x="14" y="146" font-size="9">🌸</text><text x="156" y="146" font-size="9">🌸</text>
+/* ---------- Zeichen-Helfer für Karte & Schloss ---------- */
+const n1 = v => Math.round(v * 10) / 10;
+const EMO = (x, y, size, e, cls = '') => `<text${cls ? ` class="${cls}"` : ''} x="${n1(x)}" y="${n1(y)}" font-size="${size}" text-anchor="middle" dominant-baseline="central">${e}</text>`;
+const shadowE = (x, y, rx) => `<ellipse cx="${n1(x)}" cy="${n1(y)}" rx="${n1(rx)}" ry="${n1(rx * .3)}" fill="#000" opacity=".14"/>`;
+const circ = (x, y, r, f, extra = '') => `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(r)}" fill="${f}"${extra}/>`;
+
+function roundTree(x, y, s, c, fruit){
+  const [c1, c2] = c, C = (dx, dy, r, f, o = '') => circ(x + dx * s, y + dy * s, r * s, f, o);
+  const fr = fruit ? [[-6, -15], [5, -21], [8, -11], [-2, -9]].map(([a, b]) => C(a, b, 1.5, '#E5484D')).join('') : '';
+  return shadowE(x, y + 1, 11 * s) + `<rect x="${n1(x - 2.2 * s)}" y="${n1(y - 10 * s)}" width="${n1(4.4 * s)}" height="${n1(11 * s)}" rx="${n1(1.5 * s)}" fill="#8B5A2B"/>` +
+    C(0, -19, 11.5, c2) + C(-8, -12, 8, c2) + C(8, -12, 8, c2) + C(-3, -21, 7.5, c1) + C(-9, -13, 4.5, c1) + C(-5, -24, 2.4, '#fff', ' opacity=".45"') + fr;
+}
+function pine(x, y, s, c, snow){
+  const [c1, c2] = c;
+  let r = shadowE(x, y + 1, 10 * s) + `<rect x="${n1(x - 2 * s)}" y="${n1(y - 7 * s)}" width="${n1(4 * s)}" height="${n1(8 * s)}" fill="#7A4E2A"/>`;
+  for(let i = 0; i < 3; i++){
+    const by = y - 5 * s - i * 8.5 * s, hw = (12.5 - i * 3) * s, h = 13.5 * s, ay = by - h;
+    r += `<path d="M${n1(x - hw)} ${n1(by)} L${n1(x)} ${n1(ay)} L${n1(x + hw)} ${n1(by)}Z" fill="${c2}"/><path d="M${n1(x - hw)} ${n1(by)} L${n1(x)} ${n1(ay)} L${n1(x - hw * .1)} ${n1(by)}Z" fill="${c1}"/>`;
+    if(snow) r += `<path d="M${n1(x - hw * .5)} ${n1(ay + h * .5)} L${n1(x)} ${n1(ay)} L${n1(x + hw * .5)} ${n1(ay + h * .5)} Q${n1(x + hw * .2)} ${n1(ay + h * .36)} ${n1(x)} ${n1(ay + h * .52)} Q${n1(x - hw * .2)} ${n1(ay + h * .36)} ${n1(x - hw * .5)} ${n1(ay + h * .5)}Z" fill="#fff"/>`;
+  }
+  return r;
+}
+function palm(x, y, s, c){
+  const [c1, c2] = c, tx = x + 7 * s, ty = y - 31 * s, tr = `M${n1(x)} ${n1(y)} Q${n1(x + s)} ${n1(y - 17 * s)} ${n1(tx)} ${n1(ty)}`;
+  let r = shadowE(x + 6 * s, y + 1, 12 * s) + `<path d="${tr}" stroke="#A8743D" stroke-width="${n1(4.2 * s)}" fill="none" stroke-linecap="round"/><path d="${tr}" stroke="#7A5228" stroke-width="${n1(4.2 * s)}" stroke-dasharray="${n1(1.2 * s)} ${n1(3.4 * s)}" fill="none"/>`;
+  [200, 238, 275, 312, 345].forEach(a => {
+    const rad = a * Math.PI / 180, L = 17 * s, ex = tx + Math.cos(rad) * L, ey = ty + Math.sin(rad) * L + 7 * s;
+    const cx = tx + Math.cos(rad) * L * .55, cy = ty + Math.sin(rad) * L * .55 - 6 * s, d = `M${n1(tx)} ${n1(ty)} Q${n1(cx)} ${n1(cy)} ${n1(ex)} ${n1(ey)}`;
+    r += `<path d="${d}" stroke="${c2}" stroke-width="${n1(5 * s)}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${c1}" stroke-width="${n1(1.8 * s)}" fill="none" stroke-linecap="round"/>`;
+  });
+  return r + circ(tx - 2 * s, ty + 3 * s, 2.2 * s, '#7A4E24') + circ(tx + 2.4 * s, ty + 3.6 * s, 2.2 * s, '#6A421E');
+}
+function lolli(x, y, s, col){
+  const cy = y - 28 * s, r = 9 * s, a = r * .62, b = r * .42, c = r * .22;
+  return shadowE(x, y + 1, 7 * s) +
+    `<line x1="${n1(x)}" y1="${n1(y)}" x2="${n1(x)}" y2="${n1(cy)}" stroke="#E6CFDC" stroke-width="${n1(3.4 * s)}" stroke-linecap="round"/><line x1="${n1(x)}" y1="${n1(y)}" x2="${n1(x)}" y2="${n1(cy)}" stroke="#fff" stroke-width="${n1(2 * s)}" stroke-linecap="round"/>` +
+    circ(x, cy, r, col) +
+    `<path d="M${n1(x - a)} ${n1(cy)} a${n1(a)} ${n1(a)} 0 1 1 ${n1(a)} ${n1(a)} a${n1(b)} ${n1(b)} 0 1 1 ${n1(-b)} ${n1(-b)} a${n1(c)} ${n1(c)} 0 1 1 ${n1(c)} ${n1(c)}" stroke="#fff" stroke-width="${n1(1.6 * s)}" fill="none" opacity=".9"/>` +
+    circ(x - r * .45, cy - r * .45, 1.6 * s, '#fff', ' opacity=".75"');
+}
+function bushV(x, y, s, th, rng){
+  if(th.tex === 'sprinkle'){
+    const c = th.flowers[Math.floor(rng() * th.flowers.length)];
+    return shadowE(x, y + 1, 8 * s) + `<path d="M${n1(x - 7 * s)} ${n1(y)} Q${n1(x - 7 * s)} ${n1(y - 13 * s)} ${n1(x)} ${n1(y - 13 * s)} Q${n1(x + 7 * s)} ${n1(y - 13 * s)} ${n1(x + 7 * s)} ${n1(y)}Z" fill="${c}"/>` +
+      [[-3, -8], [2, -10], [4, -5], [-4, -4]].map(([a, b]) => circ(x + a * s, y + b * s, .9 * s, '#fff')).join('');
+  }
+  const [c1, c2] = th.tex === 'snow' ? ['#FFFFFF', '#D3E3F3'] : th.treeC;
+  return shadowE(x, y + 1, 11 * s) + circ(x - 6 * s, y - 5 * s, 6 * s, c2) + circ(x + 5 * s, y - 5 * s, 6.5 * s, c2) + circ(x, y - 9 * s, 7 * s, c2) +
+    circ(x - 3 * s, y - 10 * s, 4 * s, c1) + circ(x - 7 * s, y - 6 * s, 3 * s, c1) +
+    (th.tex === 'snow' ? '' : circ(x + 4 * s, y - 8 * s, 1.5 * s, th.flowers[0]) + circ(x - 1 * s, y - 4 * s, 1.5 * s, th.flowers[0]));
+}
+function flowerV(x, y, c, snow){
+  if(snow) return `<path d="M${n1(x)} ${n1(y - 5)} v10 M${n1(x - 4.3)} ${n1(y - 2.5)} l8.6 5 M${n1(x - 4.3)} ${n1(y + 2.5)} l8.6 -5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>`;
+  let r = `<line x1="${n1(x)}" y1="${n1(y)}" x2="${n1(x)}" y2="${n1(y - 6)}" stroke="#3E8E41" stroke-width="1.1"/>`;
+  for(let k = 0; k < 5; k++){ const a = k / 5 * Math.PI * 2; r += circ(x + Math.cos(a) * 2.6, y - 8 + Math.sin(a) * 2.6, 2.1, c); }
+  return r + circ(x, y - 8, 1.5, c === '#FFD43B' ? '#F08C00' : '#FFD43B');
+}
+const rockV = (x, y, s, col) => shadowE(x, y + 1, 9 * s) + `<ellipse cx="${n1(x)}" cy="${n1(y - 3 * s)}" rx="${n1(8 * s)}" ry="${n1(5.5 * s)}" fill="${col}"/><ellipse cx="${n1(x - 2 * s)}" cy="${n1(y - 5 * s)}" rx="${n1(4 * s)}" ry="${n1(2.2 * s)}" fill="#fff" opacity=".35"/>`;
+const cloudV = (x, y, s, c) => `<g class="cloud"><ellipse cx="${n1(x)}" cy="${n1(y + 5 * s)}" rx="${n1(24 * s)}" ry="${n1(8 * s)}" fill="${c}"/>${circ(x - 11 * s, y, 9 * s, c)}${circ(x + s, y - 6 * s, 12.5 * s, c)}${circ(x + 13 * s, y + s, 8.5 * s, c)}</g>`;
+function houseV(x, y){
+  return shadowE(x, y + 1, 22) +
+    `<rect x="${x + 6}" y="${y - 37}" width="5" height="12" fill="#A0522D"/>
+    <rect x="${x - 14}" y="${y - 18}" width="28" height="18" fill="#FFF3E0" stroke="#D9B48A" stroke-width=".8"/>
+    <path d="M${x - 18} ${y - 16} L${x} ${y - 33} L${x + 18} ${y - 16}Z" fill="#E4573D"/><path d="M${x} ${y - 33} L${x + 18} ${y - 16} L${x + 3} ${y - 16}Z" fill="#000" opacity=".12"/>
+    <rect x="${x - 4}" y="${y - 11}" width="8" height="11" rx="2" fill="#8B5A2B"/>
+    <rect x="${x + 6}" y="${y - 14}" width="6" height="5" rx="1" fill="#FFE58A" stroke="#D9B48A" stroke-width=".6"/><rect x="${x - 12}" y="${y - 14}" width="6" height="5" rx="1" fill="#FFE58A" stroke="#D9B48A" stroke-width=".6"/>
+    <circle class="smoke" cx="${x + 8.5}" cy="${y - 41}" r="3" fill="#E5E7EB"/><circle class="smoke s2" cx="${x + 9.5}" cy="${y - 44}" r="3.6" fill="#E5E7EB"/>`;
+}
+const signV = (x, y) => `<line x1="${x}" y1="${y}" x2="${x}" y2="${y - 18}" stroke="#8B5A2B" stroke-width="2.4"/><rect x="${x - 22}" y="${y - 27}" width="44" height="14" rx="3" fill="#C9965F" stroke="#8B5A2B" stroke-width="1"/><text x="${x}" y="${y - 19.6}" font-size="8.5" font-weight="900" fill="#5A3A1E" text-anchor="middle" dominant-baseline="central">START</text>`;
+
+/* ---------- Das Märchenschloss (lokal: x 0..200, Boden y=170) ---------- */
+function castleSVG(open, P){
+  const u = id => `url(#${P}${id})`, WIN = open ? u('wg') : u('wn');
+  const defs = `<defs>
+    <linearGradient id="${P}tw" x1="0" x2="1"><stop offset="0" stop-color="#EBC5DA"/><stop offset=".3" stop-color="#FFF8FB"/><stop offset=".65" stop-color="#FCE9F2"/><stop offset="1" stop-color="#D6A4C3"/></linearGradient>
+    <linearGradient id="${P}wl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF9FC"/><stop offset="1" stop-color="#F1D2E3"/></linearGradient>
+    <linearGradient id="${P}rp" x1="0" x2="1"><stop offset="0" stop-color="#FBB6DA"/><stop offset=".45" stop-color="#EC4899"/><stop offset="1" stop-color="#A3195B"/></linearGradient>
+    <linearGradient id="${P}rv" x1="0" x2="1"><stop offset="0" stop-color="#D4C4FF"/><stop offset=".45" stop-color="#8B5CF6"/><stop offset="1" stop-color="#5225B0"/></linearGradient>
+    <linearGradient id="${P}gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FEF3C7"/><stop offset=".5" stop-color="#FBBF24"/><stop offset="1" stop-color="#B45309"/></linearGradient>
+    <linearGradient id="${P}wn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A48BE6"/><stop offset="1" stop-color="#5B3EA8"/></linearGradient>
+    <linearGradient id="${P}wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF7C9"/><stop offset="1" stop-color="#FFC94D"/></linearGradient>
+    <linearGradient id="${P}wd" x1="0" x2="1"><stop offset="0" stop-color="#8E5A31"/><stop offset=".5" stop-color="#B97B47"/><stop offset="1" stop-color="#7A4A26"/></linearGradient>
+    <radialGradient id="${P}gl"><stop offset="0" stop-color="#FFF7C2" stop-opacity=".9"/><stop offset="1" stop-color="#FFD36B" stop-opacity="0"/></radialGradient>
+    <pattern id="${P}st" width="12" height="8" patternUnits="userSpaceOnUse"><path d="M0 .3H12M0 4.3H12M6 .3V4.3M0 4.3V8.3M12 4.3V8.3" stroke="#C996B5" stroke-width=".6" opacity=".55" fill="none"/></pattern>
+    <pattern id="${P}sh" width="7" height="5" patternUnits="userSpaceOnUse"><path d="M0 0 A3.5 3.5 0 0 0 7 0" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width=".8"/></pattern>
+  </defs>`;
+  const flag = (x, t, col) => { const a = `M${x} ${t} Q${x + 8} ${t - 3} ${x + 17} ${t + 2} Q${x + 9} ${t + 5} ${x} ${t + 8}Z`, b = `M${x} ${t} Q${x + 8} ${t + 3} ${x + 17} ${t + 3} Q${x + 8} ${t + 9} ${x} ${t + 8}Z`;
+    return `<line x1="${x}" y1="${t + 21}" x2="${x}" y2="${t - 1}" stroke="#7A5A3A" stroke-width="1.6"/><path d="${a}" fill="${col}"><animate attributeName="d" dur="1.8s" repeatCount="indefinite" values="${a};${b};${a}"/></path>`; };
+  const fin = (x, y) => `<circle cx="${x}" cy="${y}" r="2.7" fill="${u('gd')}"/>`;
+  const win = (cx, y, w, h) => { const o = w / 2 + 1.6;
+    return `<path d="M${cx - o} ${y + h + 1} V${y + w / 2} A${o} ${o} 0 0 1 ${cx + o} ${y + w / 2} V${y + h + 1}Z" fill="#E2B2CD"/>
+    <path d="M${cx - w / 2} ${y + h} V${y + w / 2} A${w / 2} ${w / 2} 0 0 1 ${cx + w / 2} ${y + w / 2} V${y + h}Z" fill="${WIN}"/>
+    <path d="M${cx} ${y + 1} V${y + h} M${cx - w / 2} ${y + h * .58} H${cx + w / 2}" stroke="#FBEAF3" stroke-width=".9"/>
+    <rect x="${cx - w / 2 - 2.6}" y="${y + h}" width="${w + 5.2}" height="2.6" rx="1" fill="#E2B2CD"/>`; };
+  const merlons = (x1, x2, y) => { let r = ''; for(let x = x1; x <= x2 - 7; x += 11.5) r += `<rect x="${x}" y="${y - 7}" width="7" height="8" fill="${u('wl')}" stroke="#D9AFC8" stroke-width=".8"/>`; return r; };
+  const tower = (x, y, w, h, rh, roof, fc) => { const cx = x + w / 2, ap = y - rh, rp = `M${x - 5} ${y} L${cx} ${ap} L${x + w + 5} ${y} Q${cx} ${y + 5} ${x - 5} ${y}Z`;
+    let m = ''; for(let k = 0; k * 5 < w + 2; k++) m += `<rect x="${x - 1 + k * 5}" y="${y + 5}" width="2.4" height="3.2" fill="#D3A2C0"/>`;
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${u('tw')}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${u('st')}"/>
+      <path d="${rp}" fill="${u(roof)}"/><path d="${rp}" fill="${u('sh')}"/><path d="M${cx} ${ap} L${x - 5} ${y}" stroke="#fff" stroke-opacity=".55" stroke-width="1"/>
+      <rect x="${x - 2.5}" y="${y - 1}" width="${w + 5}" height="6" rx="1.5" fill="${u('tw')}" stroke="#D9AFC8" stroke-width=".7"/>${m}${fin(cx, ap)}${flag(cx, ap - 23, fc)}`; };
+  const bart = x => `<rect x="${x - 6}" y="58" width="12" height="22" fill="${u('tw')}"/><path d="M${x - 6} 80 L${x} 90 L${x + 6} 80Z" fill="${u('tw')}"/>
+      <path d="M${x - 8.5} 60 L${x} 36 L${x + 8.5} 60 Q${x} 63 ${x - 8.5} 60Z" fill="${u('rp')}"/>${fin(x, 36)}<rect x="${x - 1.6}" y="65" width="3.2" height="8" rx="1.6" fill="${WIN}"/>`;
+  const banner = x => `<rect x="${x - 1}" y="126" width="14" height="2.6" rx="1.2" fill="${u('gd')}"/><path d="M${x} 128 h12 v23 l-6 -4.5 l-6 4.5Z" fill="#8B5CF6"/><path d="M${x} 128 h3 v21 l-3 2Z" fill="#fff" opacity=".18"/>
+      <path d="M${x + 6} 135 c-1.5 -2.4 -5 -1 -3.4 1.6 l3.4 3 l3.4 -3 c1.6 -2.6 -1.9 -4 -3.4 -1.6z" fill="#FBBF24"/>`;
+  const lantern = x => `<rect x="${x - .8}" y="138" width="1.6" height="7" fill="#5B4636"/><rect x="${x - 3.2}" y="145" width="6.4" height="9" rx="1.6" fill="#5B4636"/><rect x="${x - 2}" y="146.6" width="4" height="5.6" rx="1" fill="#FFD966"/><circle cx="${x}" cy="149.5" r="7.5" fill="#FFE58A" opacity="${open ? .55 : .3}"/>`;
+  const vine = (pts, flip) => { const d = pts; return `<path d="${d}" stroke="#3E9B45" stroke-width="1.6" fill="none" stroke-linecap="round"/>`; };
+  const roses = arr => arr.map(([x, y], i) => i % 2 ? `<ellipse cx="${x}" cy="${y}" rx="2.6" ry="1.4" fill="#4FAE4F" transform="rotate(${i * 40} ${x} ${y})"/>` : `<circle cx="${x}" cy="${y}" r="2.1" fill="#F43F5E"/><circle cx="${x - .5}" cy="${y - .5}" r=".8" fill="#FDA4AF"/>`).join('');
+  let vo = ''; for(let k = 0; k <= 8; k++){ const a = Math.PI + k * Math.PI / 8; vo += `<line x1="${n1(100 + Math.cos(a) * 15)}" y1="${n1(146 + Math.sin(a) * 15)}" x2="${n1(100 + Math.cos(a) * 22)}" y2="${n1(146 + Math.sin(a) * 22)}" stroke="#D3A2C0" stroke-width=".9"/>`; }
+  const door = open
+    ? `<path d="M85 170 V146 A15 15 0 0 1 115 146 V170Z" fill="${u('wg')}"/><path d="M86 170 L62 194 H138 L114 170Z" fill="#FFE9A8" opacity=".45"/>
+       <path d="M85 170 V146 L78 149.5 V173Z" fill="${u('wd')}"/><path d="M115 170 V146 L122 149.5 V173Z" fill="${u('wd')}"/>`
+    : `<path d="M85 170 V146 A15 15 0 0 1 115 146 V170Z" fill="${u('wd')}"/>
+       ${[90, 95, 105, 110].map(x => `<line x1="${x}" y1="${x === 90 || x === 110 ? 136 : 132}" x2="${x}" y2="170" stroke="#6B3E1F" stroke-width=".7" opacity=".7"/>`).join('')}
+       <line x1="100" y1="131" x2="100" y2="170" stroke="#5B331A" stroke-width="1.2"/>
+       <rect x="85" y="143" width="30" height="2.2" fill="#5B4636"/><rect x="85" y="160" width="30" height="2.2" fill="#5B4636"/>
+       ${[88, 93, 107, 112].map(x => `<circle cx="${x}" cy="144.1" r=".9" fill="#C9B79C"/><circle cx="${x}" cy="161.1" r=".9" fill="#C9B79C"/>`).join('')}
+       <circle cx="96" cy="153" r="2.2" fill="none" stroke="${u('gd')}" stroke-width="1.2"/><circle cx="104" cy="153" r="2.2" fill="none" stroke="${u('gd')}" stroke-width="1.2"/>`;
+  return `<g class="castle">${defs}
+    ${open ? `<circle cx="100" cy="100" r="118" fill="${u('gl')}"/><g opacity=".8">${['#FF8FB1', '#FFC93C', '#7FD7A8', '#7CC4FF', '#B794F6'].map((c, i) => `<path d="M${-14 + i * 7} 170 A${114 - i * 7} ${114 - i * 7} 0 0 1 ${214 - i * 7} 170" fill="none" stroke="${c}" stroke-width="7"/>`).join('')}</g>` : ''}
+    ${tower(34, 30, 24, 100, 58, 'rv', '#F472B6')}${win(46, 46, 9, 15)}
+    ${tower(142, 30, 24, 100, 58, 'rv', '#F472B6')}${win(154, 46, 9, 15)}
+    <rect x="54" y="74" width="92" height="96" fill="${u('wl')}"/><rect x="54" y="74" width="92" height="96" fill="${u('st')}"/>${merlons(55, 146, 74)}
+    ${win(68, 84, 10, 18)}${win(132, 84, 10, 18)}
+    <circle cx="100" cy="99" r="12.5" fill="#E2B2CD"/><circle cx="100" cy="99" r="10.2" fill="${WIN}"/>
+    ${Array.from({length: 8}, (_, k) => { const a = k * Math.PI / 4; return `<line x1="100" y1="99" x2="${n1(100 + Math.cos(a) * 10)}" y2="${n1(99 + Math.sin(a) * 10)}" stroke="#FBEAF3" stroke-width=".9"/>`; }).join('')}
+    <circle cx="100" cy="99" r="4" fill="none" stroke="#FBEAF3" stroke-width=".9"/><circle cx="100" cy="99" r="1.9" fill="${u('gd')}"/>
+    <rect x="80" y="22" width="40" height="54" fill="${u('wl')}"/><rect x="80" y="22" width="40" height="54" fill="${u('st')}"/>
+    <path d="M73 22 L100 -46 L127 22 Q100 28 73 22Z" fill="${u('rv')}"/><path d="M73 22 L100 -46 L127 22 Q100 28 73 22Z" fill="${u('sh')}"/><path d="M100 -46 L73 22" stroke="#fff" stroke-opacity=".55" stroke-width="1"/>
+    <path d="M92 8 L100 -9 L108 8Z" fill="${u('wl')}"/>${win(100, -3, 6, 9)}
+    <rect x="77" y="20" width="46" height="6" rx="1.5" fill="${u('tw')}" stroke="#D9AFC8" stroke-width=".7"/>${fin(100, -46)}${flag(100, -69, '#EC4899')}
+    ${win(100, 32, 14, 24)}
+    <rect x="76" y="64" width="48" height="2.6" rx="1.2" fill="${u('tw')}" stroke="#D9AFC8" stroke-width=".5"/>
+    ${Array.from({length: 11}, (_, k) => `<rect x="${78.5 + k * 4.2}" y="66.6" width="1.6" height="8" fill="#E7C3D8"/>`).join('')}
+    <rect x="74" y="74" width="52" height="4" rx="1.5" fill="${u('tw')}" stroke="#D9AFC8" stroke-width=".6"/>
+    ${bart(56)}${bart(144)}
+    <rect x="24" y="122" width="152" height="48" fill="${u('wl')}"/><rect x="24" y="122" width="152" height="48" fill="${u('st')}"/>${merlons(26, 176, 122)}
+    ${banner(44)}${banner(144)}
+    <path d="M78 170 V146 A22 22 0 0 1 122 146 V170Z" fill="#EDCADD" stroke="#D3A2C0" stroke-width="1"/>${vo}
+    <path d="M96.5 122.5 h7 l-1.4 6 h-4.2Z" fill="${u('gd')}"/>
+    ${door}${lantern(72)}${lantern(128)}
+    ${tower(2, 84, 32, 86, 50, 'rp', '#8B5CF6')}${win(18, 100, 10, 18)}${win(18, 134, 9, 15)}
+    ${tower(166, 84, 32, 86, 50, 'rp', '#8B5CF6')}${win(182, 100, 10, 18)}${win(182, 134, 9, 15)}
+    ${vine('M5 170 C 13 156, 3 142, 12 128 S 8 106, 18 96')}${roses([[7, 160], [10, 152], [6, 141], [12, 129], [9, 118], [14, 106], [17, 98]])}
+    ${vine('M195 170 C 187 158, 197 146, 189 134 S 193 120, 186 112')}${roses([[193, 162], [190, 154], [195, 145], [189, 134], [192, 124], [187, 114]])}
+    <rect x="76" y="170" width="48" height="4" rx="1" fill="#E7C3D8"/><rect x="72" y="174" width="56" height="4" rx="1" fill="#D9AFC8"/>
+    ${circ(30, 170, 7, '#4FAE4F')}${circ(40, 171, 6, '#3E9B45')}${circ(160, 171, 6, '#3E9B45')}${circ(170, 170, 7, '#4FAE4F')}
+    ${circ(28, 167, 1.6, '#FF6FA5')}${circ(38, 168, 1.6, '#FFD43B')}${circ(168, 167, 1.6, '#FF6FA5')}${circ(161, 168, 1.6, '#FFD43B')}
   </g>`;
 }
 
+/* ---------- Szenen an den Hindernissen ---------- */
+function mountainScene(p, sc, lava){
+  const peak = (bx1, bx2, by, ax, ay) => {
+    const k = .32, lx = ax + (bx1 - ax) * k, ly = ay + (by - ay) * k, rx = ax + (bx2 - ax) * k;
+    return `<path d="M${n1(bx1)} ${n1(by)} L${n1(ax)} ${n1(ay)} L${n1(bx2)} ${n1(by)}Z" fill="${sc[0]}"/><path d="M${n1(ax)} ${n1(ay)} L${n1(bx2)} ${n1(by)} L${n1(ax + (bx2 - ax) * .12)} ${n1(by)}Z" fill="#000" opacity=".14"/>
+      <path d="M${n1(lx)} ${n1(ly)} L${n1(ax)} ${n1(ay)} L${n1(rx)} ${n1(ly)} L${n1(rx - (rx - ax) * .4)} ${n1(ly - 4)} L${n1(ax + 1)} ${n1(ly + 3)} L${n1(lx + (ax - lx) * .45)} ${n1(ly - 3)}Z" fill="${sc[1]}"/>`;
+  };
+  let r = peak(p.x - 68, p.x + 14, p.y + 16, p.x - 27, p.y - 52) + peak(p.x - 8, p.x + 68, p.y + 18, p.x + 30, p.y - 30);
+  if(lava) r += `<path d="M${n1(p.x - 30)} ${n1(p.y - 46)} q2 10 -4 20 M${n1(p.x - 24)} ${n1(p.y - 47)} q3 8 1 15" stroke="#FF6B2C" stroke-width="2.6" fill="none" stroke-linecap="round"/>` +
+    [0, 1, 2].map(i => `<circle class="smoke${i ? ' s2' : ''}" cx="${n1(p.x - 27 + i * 3)}" cy="${n1(p.y - 60 - i * 5)}" r="${4 + i}" fill="#B8B4BE"/>`).join('');
+  return r;
+}
+function swampScene(p, c){
+  let r = `<ellipse cx="${n1(p.x)}" cy="${n1(p.y + 4)}" rx="56" ry="23" fill="${c}" opacity=".85"/><ellipse cx="${n1(p.x - 8)}" cy="${n1(p.y)}" rx="34" ry="11" fill="#fff" opacity=".2"/>`;
+  [[-40, 8], [30, 14], [42, -6], [-26, -10]].forEach(([a, b]) => r += `<ellipse cx="${n1(p.x + a)}" cy="${n1(p.y + b)}" rx="5.5" ry="3.4" fill="#4FAE4F"/><path d="M${n1(p.x + a)} ${n1(p.y + b)} l5 -1.6 l0 2.4Z" fill="${c}"/>`);
+  [[-56, 0], [-52, -3], [54, 2], [58, -2]].forEach(([a, b]) => r += `<line x1="${n1(p.x + a)}" y1="${n1(p.y + b + 6)}" x2="${n1(p.x + a + 1)}" y2="${n1(p.y + b - 12)}" stroke="#5E7F32" stroke-width="1.6"/><ellipse cx="${n1(p.x + a + 1)}" cy="${n1(p.y + b - 12)}" rx="1.7" ry="3.6" fill="#7A4E24"/>`);
+  return r;
+}
+const snowScene = p => `<ellipse cx="${n1(p.x - 34)}" cy="${n1(p.y + 12)}" rx="20" ry="7" fill="#fff"/><ellipse cx="${n1(p.x - 30)}" cy="${n1(p.y + 14)}" rx="14" ry="3.6" fill="#D8E6F4"/>
+  <ellipse cx="${n1(p.x + 36)}" cy="${n1(p.y + 8)}" rx="17" ry="6" fill="#fff"/><ellipse cx="${n1(p.x + 40)}" cy="${n1(p.y + 10)}" rx="11" ry="3" fill="#D8E6F4"/>
+  ${EMO(p.x - 40, p.y - 24, 13, '❄️', 'twk')}${EMO(p.x + 38, p.y - 26, 12, '❄️', 'twk')}${EMO(p.x - 6, p.y - 42, 11, '❄️', 'twk')}${EMO(p.x + 18, p.y + 44, 12, '❄️', 'twk')}`;
+const caveV = (x, y) => shadowE(x, y + 2, 32) + `<path d="M${n1(x - 30)} ${n1(y + 2)} Q${n1(x - 27)} ${n1(y - 34)} ${n1(x)} ${n1(y - 36)} Q${n1(x + 28)} ${n1(y - 34)} ${n1(x + 32)} ${n1(y + 2)}Z" fill="#9C97A8"/>
+  <path d="M${n1(x)} ${n1(y - 36)} Q${n1(x + 28)} ${n1(y - 34)} ${n1(x + 32)} ${n1(y + 2)} L${n1(x + 12)} ${n1(y + 2)}Z" fill="#000" opacity=".12"/>
+  <path d="M${n1(x - 12)} ${n1(y + 2)} Q${n1(x - 11)} ${n1(y - 17)} ${n1(x)} ${n1(y - 18)} Q${n1(x + 11)} ${n1(y - 17)} ${n1(x + 12)} ${n1(y + 2)}Z" fill="#3B3346"/>
+  <ellipse cx="${n1(x - 16)}" cy="${n1(y - 22)}" rx="6" ry="3" fill="#fff" opacity=".22"/>${EMO(x + 3, y - 30, 10, '✨', 'twk')}`;
+
+/* ---------- Die Karte ---------- */
 function mapSVG(th, H, arrived){
   const C = curve(), rng = mulberry(th.key.length * 977 + th.key.charCodeAt(0));
+  const R = (a, b) => a + rng() * (b - a), RI = arr => arr[Math.floor(rng() * arr.length)];
+  const nearCurve = (x, y, d) => C.sm.some((p, i) => i % 4 === 0 && Math.hypot(p[0] - x, p[1] - y) < d);
   const obsPts = OBS_F.map(f => C.at(f));
-  const ri = th.obs.findIndex(o => o.river), ry = ri >= 0 ? obsPts[ri].y : -999;
-  const T = (x, y, size, e, cls = '') => `<text ${cls ? `class="${cls}"` : ''} x="${x.toFixed ? x.toFixed(1) : x}" y="${y.toFixed ? y.toFixed(1) : y}" font-size="${size}" text-anchor="middle" dominant-baseline="central">${e}</text>`;
-  let hills = '';
-  for(let i = 0; i < 8; i++){ const x = rng() * 360, y = 250 + rng() * 480;
-    hills += `<ellipse cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" rx="${(55 + rng() * 55).toFixed(0)}" ry="${(18 + rng() * 18).toFixed(0)}" fill="${th.hill}" opacity=".45"/>`; }
-  let deco = ''; const used = [];
-  for(let k = 0; k < 600 && used.length < 40; k++){
-    const x = 14 + rng() * 332, y = 24 + rng() * 716;
-    if(y < 232 && x > 62 && x < 298) continue;
-    if(Math.abs(y - ry) < 28) continue;
-    if(C.sm.some((p, i) => i % 5 === 0 && Math.hypot(p[0] - x, p[1] - y) < 32)) continue;
-    if(obsPts.some(p => Math.hypot(p.x - x, p.y - y) < 46)) continue;
-    if(used.some(p => Math.hypot(p[0] - x, p[1] - y) < 26)) continue;
-    if(Math.hypot(x - 32, y - 724) < 40) continue;
-    used.push([x, y]);
-    deco += T(x, y, (16 + rng() * 12).toFixed(0), th.decor[Math.floor(rng() * th.decor.length)]);
+  const ri = th.obs.findIndex(o => o.river), fr = ri >= 0 ? OBS_F[ri] + .035 : 0;
+  const rp = ri >= 0 ? C.at(fr) : {x: 0, y: -999}, ry = rp.y;
+  const snow = th.tex === 'snow', props = [], add = (y, svg) => props.push({y, svg});
+  const treeOf = (type, x, y, s) => type === 'round' ? roundTree(x, y, s, th.treeC, rng() < .35) : type === 'pine' ? pine(x, y, s, th.pineC, false)
+    : type === 'snowpine' ? pine(x, y, s, th.pineC, true) : type === 'palm' ? palm(x, y, s, th.treeC) : type === 'lolli' ? lolli(x, y, s, RI(th.flowers)) : bushV(x, y, s, th, rng);
+  const forestType = {wald:'pine', winter:'snowpine', insel:'palm', zucker:'lolli'}[th.key];
+
+  /* Himmel */
+  let sky = '';
+  if(th.sun) sky += circ(306, 52, 36, '#FFE98A', ' opacity=".35"') + Array.from({length: 12}, (_, k) => { const a = k * Math.PI / 6;
+      return `<line x1="${n1(306 + Math.cos(a) * 25)}" y1="${n1(52 + Math.sin(a) * 25)}" x2="${n1(306 + Math.cos(a) * 31)}" y2="${n1(52 + Math.sin(a) * 31)}" stroke="#FFD43B" stroke-width="2.6" stroke-linecap="round"/>`; }).join('') +
+    circ(306, 52, 20, '#FFD43B') + circ(300, 46, 7, '#fff', ' opacity=".35"');
+  else if(th.key === 'winter') sky += circ(306, 54, 26, '#FFFBEA', ' opacity=".55"') + circ(306, 54, 16, '#FFF6D6') + Array.from({length: 26}, () => circ(R(4, 356), R(4, 200), R(.8, 1.8), '#fff', ' opacity=".9"')).join('');
+  else sky += `<g opacity=".7">${['#FF8FB1', '#FFC93C', '#7FD7A8', '#7CC4FF', '#B794F6'].map((c, i) => `<path d="M${-26 + i * 6} 220 A${96 - i * 6} ${96 - i * 6} 0 0 1 ${166 - i * 6} 220" fill="none" stroke="${c}" stroke-width="6"/>`).join('')}</g>`;
+  const cc = th.key === 'zucker' ? '#FFF7FC' : '#FFFFFF';
+  sky += cloudV(54, 56, 1.15, cc) + cloudV(204, 30, .8, cc) + cloudV(330, 122, .7, cc);
+  if(th.sun) sky += [[112, 84], [128, 76], [244, 98]].map(([x, y]) => `<path d="M${x} ${y} q4 -4 8 0 q4 -4 8 0" stroke="#4B5563" stroke-width="1.4" fill="none" stroke-linecap="round"/>`).join('');
+
+  /* Berge */
+  const far = [[-20, 222], [28, 146], [72, 196], [118, 132], [162, 192], [206, 154], [248, 200], [292, 126], [338, 182], [380, 152], [380, 240], [-20, 240]];
+  const near = [[-20, 236], [22, 194], [66, 222], [106, 186], [152, 222], [198, 198], [242, 224], [288, 190], [332, 218], [380, 196], [380, 250], [-20, 250]];
+  const caps = pts => { let r = ''; for(let i = 1; i < pts.length - 3; i++){ const [px, py] = pts[i], [ax, ay] = pts[i - 1], [bx, by] = pts[i + 1];
+      if(py < ay && py < by){ const k = .3, l = [px + (ax - px) * k, py + (ay - py) * k], q = [px + (bx - px) * k, py + (by - py) * k];
+        r += `<path d="M${n1(l[0])} ${n1(l[1])} L${px} ${py} L${n1(q[0])} ${n1(q[1])} L${n1(q[0] - (q[0] - px) * .35)} ${n1(q[1] - 4)} L${px + 2} ${n1(l[1] + 2)} L${n1(l[0] + (px - l[0]) * .4)} ${n1(l[1] - 4)}Z" fill="#fff" opacity=".95"/>`; } } return r; };
+  const poly = (pts, c) => `<polygon points="${pts.map(p => p.join(',')).join(' ')}" fill="${c}"/>`;
+  const mtns = poly(far, th.mtn[0]) + (th.caps ? caps(far) : '') + poly(near, th.mtn[1]) + (th.key === 'zucker' ? caps(near) : '');
+  const landD = 'M-10 234 Q 60 216 120 228 T 240 224 T 370 218 V850 H-10Z';
+
+  /* Flecken, Teich */
+  let patches = '';
+  for(let i = 0; i < 14; i++) patches += `<ellipse cx="${n1(R(0, 360))}" cy="${n1(R(250, 830))}" rx="${n1(R(30, 70))}" ry="${n1(R(10, 22))}" fill="${RI(th.patch)}" opacity=".55"/>`;
+  let lake = null;
+  for(let k = 0; k < 400 && !lake; k++){ const x = R(70, 290), y = R(360, 740);
+    if(!nearCurve(x, y, 70) && !obsPts.some(p => Math.hypot(p.x - x, p.y - y) < 92) && Math.abs(y - ry) > 64) lake = {x, y}; }
+  const lakeSvg = !lake ? '' : `<ellipse cx="${n1(lake.x)}" cy="${n1(lake.y + 2)}" rx="45" ry="23" fill="${th.bank}"/><ellipse cx="${n1(lake.x)}" cy="${n1(lake.y)}" rx="39" ry="19" fill="${th.lake.c}"/>
+    <ellipse cx="${n1(lake.x - 9)}" cy="${n1(lake.y - 5)}" rx="20" ry="6" fill="#fff" opacity=".3"/>
+    <path d="M${n1(lake.x - 16)} ${n1(lake.y + 7)} q6 -3 12 0 M${n1(lake.x + 4)} ${n1(lake.y + 11)} q5 -2.5 10 0" stroke="#fff" stroke-opacity=".7" stroke-width="1.2" fill="none"/>
+    ${snow ? '' : [[-42, 4], [-38, 0], [42, 6]].map(([a, b]) => `<line x1="${n1(lake.x + a)}" y1="${n1(lake.y + b + 6)}" x2="${n1(lake.x + a + 1)}" y2="${n1(lake.y + b - 10)}" stroke="#5E7F32" stroke-width="1.5"/><ellipse cx="${n1(lake.x + a + 1)}" cy="${n1(lake.y + b - 10)}" rx="1.6" ry="3.4" fill="#7A4E24"/>`).join('')}
+    ${EMO(lake.x + 10, lake.y - 1, 16, th.lake.e)}`;
+
+  /* Szenen */
+  let groundScenes = '';
+  th.obs.forEach((o, i) => {
+    const p = obsPts[i];
+    if(o.scene === 'mountain') groundScenes += mountainScene(p, o.sc, o.lava);
+    else if(o.scene === 'swamp') groundScenes += swampScene(p, o.sc);
+    else if(o.scene === 'snow') groundScenes += snowScene(p);
+    else if(o.scene === 'forest'){
+      let cnt = 0;
+      for(let k = 0; k < 16 && cnt < 8; k++){ const a = k / 16 * Math.PI * 2 + .3, rr = 40 + (k % 3) * 8, x = p.x + Math.cos(a) * rr, y = p.y + Math.sin(a) * rr * .8 + 6;
+        if(x < 10 || x > 350 || nearCurve(x, y, 22)) continue; add(y, treeOf(forestType, x, y, R(.95, 1.25))); cnt++; }
+    } else if(o.scene === 'flowers'){
+      for(let k = 0; k < 18; k++){ const a = rng() * Math.PI * 2, rr = R(28, 50), x = p.x + Math.cos(a) * rr, y = p.y + Math.sin(a) * rr * .75 + 6;
+        if(nearCurve(x, y, 14)) continue; add(y, flowerV(x, y, RI(th.flowers), false)); }
+    } else if(o.scene === 'cave'){
+      const spot = [[44, -8], [-44, -8], [0, -46], [0, 46]].map(([a, b]) => ({x: p.x + a, y: p.y + b})).find(q => q.x > 34 && q.x < 326 && !nearCurve(q.x, q.y, 30)) || {x: p.x + 44, y: p.y - 8};
+      add(spot.y, caveV(spot.x, spot.y));
+    }
+    if(o.extra) [[-46, -4], [46, 2]].forEach(([a, b]) => { const x = p.x + a, y = p.y + b; if(x > 12 && x < 348 && !nearCurve(x, y, 16)) add(y + 6, EMO(x, y, 17, o.extra)); });
+  });
+
+  /* Fluss (kommt vom Kartenrand, kreuzt den Weg genau einmal) */
+  const rw = th.wideRiver ? 1.4 : 1;
+  let river = '', riverSpan = null;
+  if(ri >= 0){
+    const clear = d => !C.sm.some(p => Math.abs(p[1] - ry) < 38 && (d > 0 ? p[0] > rp.x + 34 : p[0] < rp.x - 34));
+    const dir = clear(1) ? 1 : clear(-1) ? -1 : 1, xe = dir > 0 ? 385 : -25, xEnd = rp.x - dir * 44, steps = 8;
+    let d = `M${xe} ${n1(ry - 4)}`;
+    for(let k = 1; k <= steps; k++){ const x = xe + (xEnd - xe) * k / steps, xm = xe + (xEnd - xe) * (k - .5) / steps;
+      d += ` Q${n1(xm)} ${n1(ry + (k % 2 ? 9 : -9))} ${n1(x)} ${n1(ry + (k === steps ? 3 : 0))}`; }
+    const px = xEnd - dir * 8;
+    river = `<path d="${d}" fill="none" stroke="${th.bank}" stroke-width="${44 * rw}" stroke-linecap="round"/><ellipse cx="${n1(px)}" cy="${n1(ry + 3)}" rx="${n1(30 * rw)}" ry="${n1(19 * rw)}" fill="${th.bank}"/>
+      <path d="${d}" fill="none" stroke="${th.river}" stroke-width="${31 * rw}" stroke-linecap="round"/><ellipse cx="${n1(px)}" cy="${n1(ry + 3)}" rx="${n1(24 * rw)}" ry="${n1(14 * rw)}" fill="${th.river}"/>
+      <path d="${d}" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="${12 * rw}" transform="translate(0 -4)"/>
+      <path class="flow" d="${d}" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-dasharray="12 16" stroke-linecap="round"/>
+      <path class="flow" d="${d}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.6" stroke-dasharray="6 22" transform="translate(0 7)"/>
+      <ellipse cx="${n1(px - dir * 6)}" cy="${n1(ry)}" rx="${n1(10 * rw)}" ry="${n1(4 * rw)}" fill="#fff" opacity=".25"/>`;
+    riverSpan = [Math.min(xe, px - 36), Math.max(xe, px + 36)];
   }
-  const wave = `M-10 ${ry} C 60 ${ry - 16}, 120 ${ry + 16}, 180 ${ry} S 300 ${ry - 16}, 370 ${ry}`;
-  const river = ri < 0 ? '' : `<path d="${wave}" fill="none" stroke="${th.river}" stroke-width="30" stroke-linecap="round"/><path d="${wave}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="2.5" stroke-dasharray="10 14"/>`;
+
+  /* Deko */
+  const used = []; let critters = 0;
+  for(let k = 0; k < 1200 && used.length < 72; k++){
+    const x = R(12, 348), y = R(246, 830);
+    if(y < 310 && x > 34 && x < 326) continue;
+    if(x < 150 && y > 752) continue;
+    if(riverSpan && x > riverSpan[0] && x < riverSpan[1] && Math.abs(y - ry) < 34) continue;
+    if(lake && Math.hypot((lake.x - x) / 1.6, lake.y - y) < 34) continue;
+    if(obsPts.some(p => Math.hypot(p.x - x, p.y - y) < 66)) continue;
+    if(nearCurve(x, y, 26)) continue;
+    if(used.some(([a, b]) => Math.hypot(a - x, b - y) < 21)) continue;
+    used.push([x, y]);
+    const t = rng();
+    if(t < .5){
+      const type = th.key === 'wald' ? (rng() < .68 ? 'round' : 'pine') : th.key === 'insel' ? (rng() < .7 ? 'palm' : 'bush') : th.tree;
+      add(y, treeOf(type, x, y, R(.8, 1.15)));
+    } else if(t < .72){ const n = 2 + Math.floor(rng() * 2); for(let q = 0; q < n; q++){ const fx = x + R(-8, 8), fy = y + R(-5, 5); add(fy, flowerV(fx, fy, RI(th.flowers), snow)); } }
+    else if(t < .84) add(y, bushV(x, y, R(.8, 1.1), th, rng));
+    else if(t < .91) add(y, rockV(x, y, R(.7, 1.1), th.rock));
+    else if(critters < 9){ critters++; add(y, EMO(x, y - 8, Math.round(R(15, 19)), RI(th.critters))); }
+  }
+  props.sort((a, b) => a.y - b.y);
+
+  /* Fluss + Brücke */
+  /* Hindernisse */
   const obs = th.obs.map((o, i) => {
-    const p = obsPts[i], w = o.n.length * 5.7 + 16, lx = Math.max(4 + w / 2, Math.min(356 - w / 2, p.x));
-    return `<g class="ob" data-i="${i}"><circle class="obc" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="21" fill="#fff" fill-opacity=".96" stroke="${th.accent}" stroke-width="3"/>
-      ${T(p.x, p.y + 1, 22, o.e, 'obe')}
-      <rect x="${(lx - w / 2).toFixed(1)}" y="${(p.y + 24).toFixed(1)}" width="${w.toFixed(1)}" height="18" rx="9" fill="#fff" fill-opacity=".93"/>
-      <text x="${lx.toFixed(1)}" y="${(p.y + 33.5).toFixed(1)}" font-size="10.5" font-weight="800" fill="#2B2140" text-anchor="middle" dominant-baseline="central">${o.n}</text>
-      <g class="chk"><circle cx="${(p.x + 16).toFixed(1)}" cy="${(p.y - 16).toFixed(1)}" r="9" fill="#1FAF6A" stroke="#fff" stroke-width="2"/><path d="M${(p.x + 11.5).toFixed(1)} ${(p.y - 16).toFixed(1)} l3 3 l5.5 -6" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></g>`;
+    const p = obsPts[i], w = o.n.length * 5.5 + 26, lx = Math.max(4 + w / 2, Math.min(356 - w / 2, p.x)), ty = p.y + 26;
+    let bridge = '';
+    if(o.river){
+      const a = C.at(fr - .006), b = C.at(fr + .006), ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI, L = 36 * rw;
+      let planks = ''; for(let x = -L + 6; x < L - 3; x += 6) planks += `<line x1="${n1(x)}" y1="-11" x2="${n1(x)}" y2="11" stroke="#000" stroke-opacity=".2" stroke-width="1"/>`;
+      bridge = `<g class="aft" transform="translate(${n1(rp.x)} ${n1(rp.y)}) rotate(${n1(ang)})">
+        <rect x="${-L}" y="-12" width="${2 * L}" height="24" rx="3" fill="${th.plank}"/>${planks}
+        <rect x="${-L - 2}" y="-16" width="${2 * L + 4}" height="4" rx="2" fill="${th.plank}" stroke="#000" stroke-opacity=".3" stroke-width=".8"/>
+        <rect x="${-L - 2}" y="12" width="${2 * L + 4}" height="4" rx="2" fill="${th.plank}" stroke="#000" stroke-opacity=".3" stroke-width=".8"/>
+        ${[-L, 0, L].map(x => `<rect x="${n1(x - 2)}" y="-19" width="4" height="6" rx="1" fill="#6B4226"/><rect x="${n1(x - 2)}" y="13" width="4" height="6" rx="1" fill="#6B4226"/>`).join('')}</g>`;
+    }
+    return `<g class="ob" data-i="${i}">${bridge}${shadowE(p.x, p.y + 22, 16)}
+      ${circ(p.x, p.y, 23, th.accent)}${circ(p.x, p.y, 23, 'url(#mgold)', ' class="ringd"')}${circ(p.x, p.y, 18.5, '#fff')}
+      ${EMO(p.x, p.y + 1, 21, o.e, 'obe')}
+      <path d="M${n1(lx - w / 2)} ${n1(ty)} H${n1(lx + w / 2)} L${n1(lx + w / 2 - 5)} ${n1(ty + 9)} L${n1(lx + w / 2)} ${n1(ty + 18)} H${n1(lx - w / 2)} L${n1(lx - w / 2 + 5)} ${n1(ty + 9)}Z" fill="${th.accent}"/>
+      <text x="${n1(lx)}" y="${n1(ty + 9.4)}" font-size="10.5" font-weight="800" fill="#fff" text-anchor="middle" dominant-baseline="central">${o.n}</text>
+      <g class="chk">${circ(p.x + 17, p.y - 17, 9, '#1FAF6A', ' stroke="#fff" stroke-width="2"')}<path d="M${n1(p.x + 12.5)} ${n1(p.y - 17)} l3 3 l5.5 -6" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></g>`;
   }).join('');
-  const waitBubble = arrived
-    ? `${T(146, 150, 18, '💕', 'twk')}${T(216, 150, 18, '💕', 'twk')}${T(110, 100, 16, '✨', 'twk')}${T(250, 96, 16, '✨', 'twk')}${T(180, 4 + 14, 14, '✨', 'twk')}`
-    : `<g class="wait"><rect x="198" y="158" width="100" height="26" rx="13" fill="#fff" stroke="${th.accent}" stroke-width="2"/><text x="248" y="171.5" font-size="11.5" font-weight="800" fill="#2B2140" text-anchor="middle" dominant-baseline="central">Ich warte! 💕</text></g>`;
-  return `<svg id="jmap" viewBox="0 0 360 760" role="img" aria-label="Karte der Reise zum Schloss">
-    <defs><linearGradient id="jbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${th.bg[0]}"/><stop offset="1" stop-color="${th.bg[1]}"/></linearGradient></defs>
-    <rect width="360" height="760" fill="url(#jbg)"/>
-    ${T(40, 40, 30, '☁️')}${T(326, 70, 26, '☁️')}${T(300, 26, 20, '☁️')}
-    ${hills}${river}
-    <ellipse cx="180" cy="196" rx="138" ry="28" fill="${th.hill}"/>
-    ${deco}
+
+  /* Burgberg */
+  const mound = `<ellipse cx="180" cy="270" rx="172" ry="42" fill="${th.hill}"/><ellipse cx="168" cy="260" rx="120" ry="22" fill="#fff" opacity=".18"/>`;
+  const moundDeco = rockV(28, 286, 1.1, th.rock) + rockV(334, 278, .9, th.rock) + bushV(56, 282, 1, th, rng) + bushV(306, 290, 1, th, rng) +
+    flowerV(78, 292, th.flowers[0], snow) + flowerV(86, 296, th.flowers[1], snow) + flowerV(284, 294, th.flowers[0], snow) + flowerV(276, 298, RI(th.flowers), snow);
+
+  const deco = arrived
+    ? `${EMO(150, 226, 18, '💕', 'twk')}${EMO(212, 222, 18, '💕', 'twk')}${EMO(64, 120, 16, '✨', 'twk')}${EMO(298, 112, 16, '✨', 'twk')}${EMO(180, 12, 14, '✨', 'twk')}`
+    : `<g class="wait"><rect x="210" y="252" width="100" height="26" rx="13" fill="#fff" stroke="${th.accent}" stroke-width="2"/><text x="260" y="265.5" font-size="11.5" font-weight="800" fill="#2B2140" text-anchor="middle" dominant-baseline="central">Ich warte! 💕</text></g>`;
+
+  const tex = {
+    grass: `<path d="M5 20 l1.5 -5 M8 20 v-6 M11 20 l-1.5 -5 M20 9 l1.2 -4 M22.5 9 v-5 M25 9 l-1.2 -4" stroke="${th.texc}" stroke-width="1.1" stroke-linecap="round" opacity=".5"/>`,
+    snow: `<circle cx="5" cy="6" r="1.1" fill="${th.texc}" opacity=".4"/><circle cx="19" cy="17" r=".9" fill="${th.texc}" opacity=".4"/><circle cx="24" cy="5" r=".7" fill="#fff"/>`,
+    sand: `<circle cx="5" cy="6" r=".9" fill="${th.texc}" opacity=".5"/><circle cx="18" cy="15" r=".8" fill="${th.texc}" opacity=".5"/><circle cx="25" cy="21" r=".7" fill="${th.texc}" opacity=".4"/>`,
+    sprinkle: `<rect x="3" y="5" width="5" height="1.7" rx=".85" fill="#FF5FA2" transform="rotate(30 5.5 6)" opacity=".6"/><rect x="17" y="14" width="5" height="1.7" rx=".85" fill="#7BD3F7" transform="rotate(-40 19.5 15)" opacity=".6"/><rect x="22" y="3" width="5" height="1.7" rx=".85" fill="#FFD43B" transform="rotate(70 24.5 4)" opacity=".6"/>`
+  }[th.tex];
+
+  return `<svg id="jmap" viewBox="0 0 360 840" role="img" aria-label="Karte der Reise zum Schloss">
+    <defs>
+      <linearGradient id="msky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${th.sky[0]}"/><stop offset="1" stop-color="${th.sky[1]}"/></linearGradient>
+      <linearGradient id="mland" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${th.land[0]}"/><stop offset="1" stop-color="${th.land[1]}"/></linearGradient>
+      <linearGradient id="mgold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FEF3C7"/><stop offset=".5" stop-color="#FBBF24"/><stop offset="1" stop-color="#D97706"/></linearGradient>
+      <linearGradient id="mhg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FEF08A"/><stop offset="1" stop-color="#F59E0B"/></linearGradient>
+      <pattern id="mtx" width="30" height="26" patternUnits="userSpaceOnUse">${tex}</pattern>
+    </defs>
+    <rect width="360" height="840" fill="url(#msky)"/>${sky}${mtns}
+    <path d="${landD}" fill="url(#mland)"/><path d="${landD}" fill="url(#mtx)"/>
+    ${patches}${groundScenes}${lakeSvg}${mound}
+    <path d="${C.d}" fill="none" stroke="${th.trailEdge}" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="${C.d}" fill="none" stroke="${th.trail}" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="${C.d}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>
-    <path id="jprog" d="${C.d}" pathLength="1000" fill="none" stroke="#FFC93C" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 1001"/>
-    ${T(32, 722, 30, '🏡')}<rect x="10" y="740" width="44" height="17" rx="8.5" fill="#fff" fill-opacity=".93"/><text x="32" y="749" font-size="10.5" font-weight="900" fill="#2B2140" text-anchor="middle" dominant-baseline="central">START</text>
+    <path d="${C.d}" fill="none" stroke="${th.trailEdge}" stroke-opacity=".45" stroke-width="3" stroke-dasharray="1 9" stroke-linecap="round"/>
+    <path class="jp" d="${C.d}" pathLength="1000" fill="none" stroke="#FFE27A" stroke-opacity=".6" stroke-width="14" stroke-linecap="round" stroke-dasharray="0 1001"/>
+    <path class="jp" d="${C.d}" pathLength="1000" fill="none" stroke="#F5B30B" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 1001"/>
+    ${river}${moundDeco}
+    ${props.map(p => p.svg).join('')}
     ${obs}
-    <g transform="translate(90 44)">${castleSVG(arrived)}</g>
-    ${T(180, 178, 28, H.p)}
-    ${waitBubble}
-    <g id="jhero"><ellipse cx="0" cy="22" rx="16" ry="5" fill="#000" opacity=".18"/><g class="hbob"><circle r="22" fill="#fff" stroke="#FFC93C" stroke-width="4"/>${T(0, 1, 27, H.e)}</g></g>
+    ${houseV(26, 818)}${signV(104, 832)}
+    <g transform="translate(80 76)">${castleSVG(arrived, 'cm')}</g>
+    ${EMO(180, 232, 22, H.p)}
+    ${deco}
+    <g id="jhero">${shadowE(0, 25, 17)}<g class="hbob">${circ(0, 0, 25, 'url(#mhg)')}${circ(0, 0, 20.5, '#fff')}${EMO(0, 1, 27, H.e)}${EMO(16, -18, 11, '✨', 'twk')}</g></g>
   </svg>`;
 }
 
@@ -1073,10 +1373,10 @@ function viewReise(){
 function setupMap(){
   const tok = mapToken, J = state.journey, T = J.target, prog = jProg(), C = curve(), thr = jThr(), th = jTheme();
   const svg = $('#jmap'); if(!svg) return;
-  const hero = svg.querySelector('#jhero'), pp = svg.querySelector('#jprog'), obs = [...svg.querySelectorAll('.ob')];
+  const hero = svg.querySelector('#jhero'), pp = [...svg.querySelectorAll('.jp')], obs = [...svg.querySelectorAll('.ob')];
   const place = v => { const f = v / T, p = C.at(f);
     hero.setAttribute('transform', `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
-    pp.setAttribute('stroke-dasharray', `${(f * 1000).toFixed(1)} 1001`); };
+    pp.forEach(el => el.setAttribute('stroke-dasharray', `${(f * 1000).toFixed(1)} 1001`)); };
   const mark = v => obs.forEach((o, i) => { const done = v >= thr[i]; o.classList.toggle('done', done);
     o.querySelector('.obe').textContent = done ? (th.obs[i].after || th.obs[i].e) : th.obs[i].e; });
   const from = Math.min(J.seen, prog);
@@ -1108,11 +1408,11 @@ function celebrate(){
   const th = jTheme(), H = heroInfo();
   sfx.win(); confetti(90, ['🎆','🎇','✨','💖','👑','⭐','🎉']);
   setTimeout(() => confetti(60, ['💕','✨','🎆','🌟','👑']), 1500);
-  const m = modal(`<svg class="celsvg" viewBox="-10 -44 200 236" aria-hidden="true">${castleSVG(true)}
-      <ellipse cx="90" cy="176" rx="100" ry="22" fill="#9BD98A"/>
-      <text x="62" y="170" font-size="40" text-anchor="middle" dominant-baseline="central">${H.e}</text>
-      <text x="118" y="170" font-size="40" text-anchor="middle" dominant-baseline="central">${H.p}</text>
-      <text class="twk" x="90" y="146" font-size="22" text-anchor="middle" dominant-baseline="central">💕</text></svg>
+  const m = modal(`<svg class="celsvg" viewBox="-12 -78 224 284" aria-hidden="true">${castleSVG(true, 'cc')}
+      <ellipse cx="100" cy="194" rx="114" ry="20" fill="#9BD98A"/>
+      <text x="64" y="186" font-size="38" text-anchor="middle" dominant-baseline="central">${H.e}</text>
+      <text x="136" y="186" font-size="38" text-anchor="middle" dominant-baseline="central">${H.p}</text>
+      <text class="twk" x="100" y="160" font-size="20" text-anchor="middle" dominant-baseline="central">💕</text></svg>
     <h2>Angekommen! 🎉</h2><p>${H.Der} ist endlich im Märchenschloss! ${H.pDie} hat schon gewartet. Jetzt wird ein großes Schlossfest gefeiert!</p>
     <div class="trophy">Neuer Reise-Pokal: <span>${th.trophy}</span></div>
     <div class="btnrow"><button class="btn" data-newj style="--ga:#8B5CF6">Neue Reise starten ➜</button></div>`);
