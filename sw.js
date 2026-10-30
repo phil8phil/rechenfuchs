@@ -1,7 +1,7 @@
 /* Rechenfuchs – Service Worker
    WICHTIG: Bei jeder Änderung an einer Datei die CACHE-Version erhöhen,
    sonst lädt das iPhone die neue Version nicht. */
-const CACHE = 'rechenfuchs-v1.2.0';
+const CACHE = 'rechenfuchs-v1.2.1';
 const ASSETS = [
   './',
   './index.html',
