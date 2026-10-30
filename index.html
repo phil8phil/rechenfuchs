@@ -363,6 +363,12 @@ h1,h2,h3,p{margin:0}
 .hbob{animation:hbob 1.4s ease-in-out infinite}
 .twk{animation:twk 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 .wait{animation:hbob 2.4s ease-in-out infinite}
+.mapsel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
+.mapsel button{background:var(--bg);border:3px solid transparent;border-radius:18px;padding:8px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:800;font-size:15px}
+.mapsel button small{font-size:12px;color:var(--muted);font-weight:650}
+.mapsel button.on{border-color:#8B5CF6;background:color-mix(in srgb,#8B5CF6 14%,var(--card))}
+.mthumb{width:min(100%,96px);aspect-ratio:360/604;border-radius:12px;display:block;margin-bottom:4px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+@media (max-height:740px){ .mthumb{width:70px} }
 .trow{display:flex;flex-wrap:wrap;gap:10px;font-size:34px}
 .celsvg{width:100%;max-width:300px;display:block;margin:-8px auto 2px}
 .trophy{font-weight:800;margin:0 0 14px;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -483,7 +489,7 @@ h1,h2,h3,p{margin:0}
    Rechenfuchs – Mathe-Spiele für die 2. Klasse
    Alle Daten bleiben lokal im Gerät (localStorage).
    ========================================================= */
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 const KEY = 'rechenfuchs.v1';
 const SCHEMA = 2;
 const STARS_PER_STICKER = 15;
@@ -584,6 +590,13 @@ const THEMES = [
         {e:'🐝', n:'Die Bienenwiese', ok:'Die Bienen summen fröhlich!', after:'🌸', scene:'flowers', extra:'🐝'}, GATE]}
 ];
 const WAY = [[60,782],[190,770],[300,722],[282,648],[160,618],[68,564],[86,490],[216,462],[300,404],[262,346],[140,328],[180,284]];
+/* Jede Karte hat ihren eigenen Weg (Start unten, Ziel immer am Schlosstor 180/284) */
+const WAYS = {
+  wald:   WAY,
+  winter: [[300,786],[170,782],[66,746],[58,672],[150,640],[282,622],[306,548],[226,504],[96,492],[52,424],[106,370],[226,372],[214,318],[180,284]],
+  insel:  [[180,788],[96,768],[48,706],[76,640],[182,616],[294,590],[306,512],[222,472],[118,456],[56,396],[126,350],[180,336],[180,284]],
+  zucker: [[44,788],[52,700],[124,648],[236,672],[306,616],[268,540],[150,560],[66,500],[100,420],[210,446],[300,386],[262,326],[180,284]]
+};
 const HEROES = {
   king:  {e:'🤴', p:'👸', name:'König',   Der:'Der König',   akk:'den König',   pDie:'Die Königin', pDat:'zur Königin'},
   queen: {e:'👸', p:'🤴', name:'Königin', Der:'Die Königin', akk:'die Königin', pDie:'Der König',   pDat:'zum König'}
@@ -606,7 +619,7 @@ function defaults(){
   const games = {}; GAMES.forEach(g => games[g.id] = defaultGame());
   return {schema:SCHEMA, created:Date.now(), profile:{name:'', avatar:'🐻', onboarded:false},
     settings:{sound:true, dailyGoal:20}, games, stars:0, stickers:[], mistakes:[], days:{}, goalDays:[],
-    journey:{hero:null, n:0, start:0, target:120, seen:0, trophies:[]}};
+    journey:{hero:null, n:0, map:0, start:0, target:120, seen:0, trophies:[]}};
 }
 function normalize(raw){
   const d = defaults();
@@ -647,6 +660,9 @@ function normalize(raw){
     seen: sj ? Math.max(0, parseInt(sj.seen, 10) || 0) : 0,
     trophies: sj && Array.isArray(sj.trophies) ? sj.trophies.filter(x => typeof x === 'string').slice(-200) : []
   };
+  // Seit 1.4: Karte frei wählbar (vorher automatisch reihum über n)
+  const mp = sj ? parseInt(sj.map, 10) : NaN;
+  out.journey.map = mp >= 0 && mp < 4 ? mp : out.journey.n % 4;
   if(out.journey.start > out.stars) out.journey.start = out.stars;
   return out;
 }
@@ -1005,18 +1021,18 @@ function onboarding(){
    Reise zum Schloss (Gesamtziel, ca. 1 Woche)
    ========================================================= */
 const heroInfo = () => HEROES[state.journey.hero || 'king'];
-const jTheme = (n = state.journey.n) => THEMES[n % THEMES.length];
+const jTheme = () => THEMES[state.journey.map] || THEMES[0];
 const jProg = () => Math.max(0, Math.min(state.journey.target, state.stars - state.journey.start));
 const jArrived = () => state.stars - state.journey.start >= state.journey.target;
 const jThr = () => OBS_F.map(f => Math.round(f * state.journey.target));
-let mapToken = 0, CURVE = null;
+let mapToken = 0; const CURVES = {};
 
 function mulberry(a){ return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
 /* Weg als weiche Kurve (Catmull-Rom -> Bezier), mit eigener Längenmessung */
-function curve(){
-  if(CURVE) return CURVE;
-  const P = WAY; let d = `M${P[0][0]} ${P[0][1]}`; const sm = [];
+function curve(th = jTheme()){
+  if(CURVES[th.key]) return CURVES[th.key];
+  const P = WAYS[th.key] || WAY; let d = `M${P[0][0]} ${P[0][1]}`; const sm = [];
   for(let i = 0; i < P.length - 1; i++){
     const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2;
     const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
@@ -1035,7 +1051,7 @@ function curve(){
     const seg = cum[hi] - cum[lo] || 1, r = (t - cum[lo]) / seg;
     return {x: sm[lo][0] + (sm[hi][0] - sm[lo][0]) * r, y: sm[lo][1] + (sm[hi][1] - sm[lo][1]) * r};
   };
-  return CURVE = {d, sm, L, at};
+  return CURVES[th.key] = {d, sm, L, at, start: {x: P[0][0], y: P[0][1]}};
 }
 
 /* ---------- Zeichen-Helfer für Karte & Schloss ---------- */
@@ -1287,7 +1303,11 @@ const caveV = (x, y) => shadowE(x, y + 2, 32) + `<path d="M${n1(x - 30)} ${n1(y 
 
 /* ---------- Die Karte ---------- */
 function mapSVG(th, H, arrived){
-  const C = curve(), rng = mulberry(th.key.length * 977 + th.key.charCodeAt(0));
+  const C = curve(th), rng = mulberry(th.key.length * 977 + th.key.charCodeAt(0));
+  /* Startdorf folgt dem Wegbeginn */
+  const S0 = C.start, sdir = S0.x < 120 ? 1 : S0.x > 240 ? -1 : 1;
+  const hx = Math.max(26, Math.min(334, S0.x - 34 * sdir)), sx = Math.max(26, Math.min(334, S0.x + 44 * sdir)), hy = S0.y + 36, sy = Math.min(838, S0.y + 50);
+  const inStart = (x, y, pad = 0) => y > S0.y - 34 - pad && x > Math.min(hx, sx) - 34 - pad && x < Math.max(hx, sx) + 34 + pad;
   const R = (a, b) => a + rng() * (b - a), RI = arr => arr[Math.floor(rng() * arr.length)];
   const nearCurve = (x, y, d) => C.sm.some((p, i) => i % 4 === 0 && Math.hypot(p[0] - x, p[1] - y) < d);
   const obsPts = OBS_F.map(f => C.at(f));
@@ -1378,7 +1398,7 @@ function mapSVG(th, H, arrived){
     const x = R(50, 310), y = R(340, 780);
     if(nearCurve(x, y, 46) || obsPts.some(p => Math.hypot(p.x - x, p.y - y) < 80) || (lake && Math.hypot(lake.x - x, lake.y - y) < 80)) continue;
     if(riverSpan && x > riverSpan[0] - 20 && x < riverSpan[1] + 20 && Math.abs(y - ry) < 50) continue;
-    if(meadows.some(m => Math.hypot(m.x - x, m.y - y) < 120) || (x < 120 && y > 740)) continue;
+    if(meadows.some(m => Math.hypot(m.x - x, m.y - y) < 120) || inStart(x, y, 30)) continue;
     meadows.push({x, y});
     meadowGround += `<ellipse cx="${n1(x)}" cy="${n1(y)}" rx="38" ry="15" fill="${th.patch[1]}" opacity=".8"/><ellipse cx="${n1(x - 6)}" cy="${n1(y - 2)}" rx="24" ry="7" fill="#fff" opacity=".18"/>`;
     for(let q = 0; q < 13; q++){ const a = rng() * Math.PI * 2, rr = Math.sqrt(rng()), fx = x + Math.cos(a) * 32 * rr, fy = y + Math.sin(a) * 11 * rr + 4;
@@ -1389,7 +1409,7 @@ function mapSVG(th, H, arrived){
   for(let f = .02, k = 0; f < .965; f += .021, k++){
     const a = C.at(f - .003), b = C.at(f + .003), p = C.at(f), L = Math.hypot(b.x - a.x, b.y - a.y) || 1, nx = -(b.y - a.y) / L, ny = (b.x - a.x) / L;
     const side = k % 2 ? 1 : -1, d = 16 + Math.max(0, ny * side) * 12 + rng() * 2, x = p.x + nx * d * side, y = p.y + ny * d * side;
-    if(x < 8 || x > 352 || (x < 70 && y > 760)) continue;
+    if(x < 8 || x > 352 || inStart(x, y)) continue;
     if(obsPts.some(q => Math.hypot(q.x - x, q.y - y) < 46)) continue;
     if(riverSpan && x > riverSpan[0] && x < riverSpan[1] && Math.abs(y - ry) < 30) continue;
     if(nearCurve(x, y, 14)) continue;
@@ -1407,7 +1427,7 @@ function mapSVG(th, H, arrived){
   for(let k = 0; k < 1200 && used.length < 72; k++){
     const x = R(12, 348), y = R(246, 830);
     if(y < 310 && x > 34 && x < 326) continue;
-    if(x < 150 && y > 752) continue;
+    if(inStart(x, y, 6)) continue;
     if(riverSpan && x > riverSpan[0] && x < riverSpan[1] && Math.abs(y - ry) < 34) continue;
     if(lake && Math.hypot((lake.x - x) / 1.6, lake.y - y) < 34) continue;
     if(meadows.some(m => Math.hypot((m.x - x) / 2, m.y - y) < 20)) continue;
@@ -1484,7 +1504,7 @@ function mapSVG(th, H, arrived){
     ${river}${moundDeco}
     ${props.map(p => p.svg).join('')}
     ${obs}
-    ${houseV(26, 818)}${signV(104, 832)}
+    ${houseV(hx, hy)}${signV(sx, sy)}
     <g transform="translate(80 76)">${castleSVG(arrived, 'cm')}</g>
     ${EMO(180, 232, 22, H.p)}
     ${deco}
@@ -1509,7 +1529,7 @@ function viewReise(){
 }
 
 function setupMap(){
-  const tok = mapToken, J = state.journey, T = J.target, prog = jProg(), C = curve(), thr = jThr(), th = jTheme();
+  const tok = mapToken, J = state.journey, T = J.target, prog = jProg(), th = jTheme(), C = curve(th), thr = jThr();
   const svg = $('#jmap'); if(!svg) return;
   const hero = svg.querySelector('#jhero'), pp = [...svg.querySelectorAll('.jp')], obs = [...svg.querySelectorAll('.ob')];
   const place = v => { const f = v / T, p = C.at(f);
@@ -1556,9 +1576,41 @@ function celebrate(){
     <div class="btnrow"><button class="btn" data-newj style="--ga:#8B5CF6">Neue Reise starten ➜</button></div>`);
   m.el.classList.add('celeb');
   m.el.querySelector('[data-newj]').onclick = () => {
-    const J = state.journey; J.trophies.push(th.trophy); J.start += J.target; J.n++; J.seen = 0; save();
-    m.close(); sfx.sticker(); tab = 'reise'; window.scrollTo(0, 0); renderView();
-    toast(`🗺️ Neue Reise: ${jTheme().title}!`, 3200);
+    const J = state.journey; J.trophies.push(th.trophy); J.start += J.target; J.n++; J.seen = 0;
+    J.map = (J.map + 1) % THEMES.length;   // Vorschlag, falls die Auswahl abgebrochen wird
+    save(); m.close(); sfx.sticker(); mapChooser();
+  };
+}
+
+/* Mini-Vorschau einer Karte mit ihrem Weg */
+function mapThumb(th, i){
+  const C = curve(th), id = 'tg' + i, pts = OBS_F.map(f => C.at(f));
+  return `<svg class="mthumb" viewBox="0 236 360 604" aria-hidden="true">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${th.land[0]}"/><stop offset="1" stop-color="${th.land[1]}"/></linearGradient></defs>
+    <rect x="0" y="236" width="360" height="604" fill="url(#${id})"/>
+    <ellipse cx="180" cy="270" rx="172" ry="42" fill="${th.hill}"/>
+    <path d="${C.d}" fill="none" stroke="${th.trailEdge}" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${C.d}" fill="none" stroke="${th.trail}" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+    ${pts.map((p, k) => `<circle cx="${n1(p.x)}" cy="${n1(p.y)}" r="30" fill="#fff" stroke="${th.accent}" stroke-width="6"/>${EMO(p.x, p.y + 2, 34, th.obs[k].e)}`).join('')}
+    ${EMO(180, 268, 76, '🏰')}${EMO(C.start.x, C.start.y + 6, 50, '🏡')}
+  </svg>`;
+}
+function mapChooser(){
+  const J = state.journey, sugg = J.map;
+  let sel = sugg;
+  const m = modal(`<div class="mbig" style="font-size:56px">🗺️</div><h2>Wohin geht die nächste Reise?</h2>
+    <p>Such dir eine Karte aus! Jede hat einen anderen Weg.</p>
+    <div class="mapsel">${THEMES.map((th, i) => { const done = J.trophies.includes(th.trophy);
+      return `<button data-mapi="${i}" class="${i === sel ? 'on' : ''}">${mapThumb(th, i)}<b>${th.name}</b><small>${done ? `${th.trophy} schon geschafft` : '✨ neu'}</small></button>`; }).join('')}</div>
+    <div class="btnrow"><button class="btn" data-go style="--ga:#8B5CF6">Los geht's! ➜</button></div>`);
+  m.el.classList.add('celeb');
+  m.el.onclick = e => {
+    const b = e.target.closest('[data-mapi]');
+    if(b){ sel = +b.dataset.mapi; m.el.querySelectorAll('[data-mapi]').forEach(x => x.classList.toggle('on', x === b)); sfx.tap(); return; }
+    if(e.target.closest('[data-go]')){
+      J.map = sel; save(); m.close(); sfx.ok(); tab = 'reise'; window.scrollTo(0, 0); renderView();
+      toast(`🗺️ Neue Reise: ${jTheme().title}!`, 3200);
+    }
   };
 }
 
