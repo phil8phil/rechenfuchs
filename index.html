@@ -483,7 +483,7 @@ h1,h2,h3,p{margin:0}
    Rechenfuchs – Mathe-Spiele für die 2. Klasse
    Alle Daten bleiben lokal im Gerät (localStorage).
    ========================================================= */
-const VERSION = '1.2.1';
+const VERSION = '1.3.0';
 const KEY = 'rechenfuchs.v1';
 const SCHEMA = 2;
 const STARS_PER_STICKER = 15;
@@ -1108,6 +1108,73 @@ function houseV(x, y){
 }
 const signV = (x, y) => `<line x1="${x}" y1="${y}" x2="${x}" y2="${y - 18}" stroke="#8B5A2B" stroke-width="2.4"/><rect x="${x - 22}" y="${y - 27}" width="44" height="14" rx="3" fill="#C9965F" stroke="#8B5A2B" stroke-width="1"/><text x="${x}" y="${y - 19.6}" font-size="8.5" font-weight="900" fill="#5A3A1E" text-anchor="middle" dominant-baseline="central">START</text>`;
 
+
+/* ---------- Schöne Blumen ---------- */
+const FL_TYPES = {wald:['tulip','daisy','sun','rose','bell','daisy','tulip'], winter:['snowdrop','xrose','crystal','snowdrop'],
+  insel:['hibiscus','plumeria','hibiscus','tulip'], zucker:['daisy','tulip','rose','candy']};
+const stemV = (x, y, h, s, c = 0) => `<path d="M${n1(x)} ${n1(y)} q${n1(c * s)} ${n1(-h * s / 2)} 0 ${n1(-h * s)}" stroke="#3E9B45" stroke-width="${n1(1.3 * s)}" fill="none" stroke-linecap="round"/>`;
+const leafV = (x, y, s, d) => `<path d="M${n1(x)} ${n1(y)} q${n1(d * 6 * s)} ${n1(-2 * s)} ${n1(d * 7 * s)} ${n1(-7 * s)} q${n1(-d * 5 * s)} ${n1(s)} ${n1(-d * 7 * s)} ${n1(7 * s)}Z" fill="#4FAE4F"/>`;
+function petals(cx, cy, n, d, rx, ry, col, rot = 0, op = ''){
+  let r = '';
+  for(let k = 0; k < n; k++){ const a = k * 360 / n + rot, ar = a * Math.PI / 180, px = cx + Math.cos(ar) * d, py = cy + Math.sin(ar) * d;
+    r += `<ellipse cx="${n1(px)}" cy="${n1(py)}" rx="${n1(rx)}" ry="${n1(ry)}" fill="${col}"${op} transform="rotate(${n1(a + 90)} ${n1(px)} ${n1(py)})"/>`; }
+  return r;
+}
+function fancyFlower(t, x, y, s, c){
+  switch(t){
+    case 'tulip': { const h = y - 15 * s;
+      return stemV(x, y, 15, s, 1) + leafV(x, y - 2 * s, s, -1) +
+        `<path d="M${n1(x - 4.2 * s)} ${n1(h + s)} Q${n1(x - 5.4 * s)} ${n1(h - 6 * s)} ${n1(x - 2.8 * s)} ${n1(h - 8.4 * s)} L${n1(x)} ${n1(h - 5 * s)} L${n1(x + 2.8 * s)} ${n1(h - 8.4 * s)} Q${n1(x + 5.4 * s)} ${n1(h - 6 * s)} ${n1(x + 4.2 * s)} ${n1(h + s)} Q${n1(x)} ${n1(h + 3.6 * s)} ${n1(x - 4.2 * s)} ${n1(h + s)}Z" fill="${c}"/>` +
+        `<path d="M${n1(x - 2.8 * s)} ${n1(h - 8.4 * s)} L${n1(x)} ${n1(h - 5 * s)} L${n1(x)} ${n1(h + 2.4 * s)} Q${n1(x - 4 * s)} ${n1(h + 2 * s)} ${n1(x - 4.2 * s)} ${n1(h + s)} Q${n1(x - 5.4 * s)} ${n1(h - 6 * s)} ${n1(x - 2.8 * s)} ${n1(h - 8.4 * s)}Z" fill="#fff" opacity=".25"/>`; }
+    case 'daisy': case 'candy': { const cy = y - 13 * s;
+      return stemV(x, y, 13, s, -1) + leafV(x, y - 3 * s, s, 1) + petals(x, cy, 10, 3.4 * s, 1.3 * s, 3 * s, c) +
+        circ(x, cy, 2.3 * s, t === 'candy' ? '#fff' : '#FFC93C') +
+        (t === 'candy' ? `<path d="M${n1(x - 1.6 * s)} ${n1(cy - s)} l${n1(3.2 * s)} ${n1(2 * s)}" stroke="${c}" stroke-width="${n1(.9 * s)}"/>` : circ(x - .6 * s, cy - .6 * s, .8 * s, '#FFE58A')); }
+    case 'sun': { const cy = y - 24 * s;
+      return stemV(x, y, 24, s, 1.5) + leafV(x, y - 7 * s, s * 1.3, -1) + leafV(x, y - 13 * s, s * 1.1, 1) +
+        petals(x, cy, 14, 5.4 * s, 1.7 * s, 3.8 * s, '#FFB703') + petals(x, cy, 14, 4.6 * s, 1.3 * s, 3 * s, '#FFD84D', 12.8) +
+        circ(x, cy, 3.8 * s, '#7A4A1E') + circ(x - s, cy - s, 1.2 * s, '#9A6A3A'); }
+    case 'rose': { const cy = y - 14 * s;
+      return stemV(x, y, 14, s, 1) + leafV(x, y - 5 * s, s, -1) + leafV(x, y - 8 * s, s * .8, 1) + circ(x, cy, 4 * s, c) +
+        `<path d="M${n1(x - 1.6 * s)} ${n1(cy)} a${n1(1.6 * s)} ${n1(1.6 * s)} 0 1 1 ${n1(1.6 * s)} ${n1(1.6 * s)} a${n1(2.8 * s)} ${n1(2.8 * s)} 0 1 1 ${n1(-2.8 * s)} ${n1(-2.4 * s)}" stroke="#000" stroke-opacity=".22" stroke-width="${n1(.9 * s)}" fill="none"/>` +
+        circ(x - 1.4 * s, cy - 1.6 * s, .9 * s, '#fff', ' opacity=".5"'); }
+    case 'bell': {
+      let r = `<path d="M${n1(x)} ${n1(y)} q${n1(-s)} ${n1(-10 * s)} ${n1(4 * s)} ${n1(-17 * s)}" stroke="#3E9B45" stroke-width="${n1(1.3 * s)}" fill="none"/>` + leafV(x, y - s, s, -1);
+      [[.2, -6], [1.8, -11], [3.6, -15.4]].forEach(([dx, dy]) => { const bx = x + dx * s + 1.4 * s, by = y + dy * s + 1.6 * s;
+        r += `<path d="M${n1(bx - 2.2 * s)} ${n1(by + 3.4 * s)} Q${n1(bx - 2.4 * s)} ${n1(by)} ${n1(bx)} ${n1(by - .4 * s)} Q${n1(bx + 2.4 * s)} ${n1(by)} ${n1(bx + 2.2 * s)} ${n1(by + 3.4 * s)} Z" fill="#7C83F6"/>`; });
+      return r; }
+    case 'snowdrop': { const tx = x + 3 * s, ty = y - 14 * s;
+      return `<path d="M${n1(x)} ${n1(y)} q0 ${n1(-12 * s)} ${n1(3 * s)} ${n1(-14 * s)}" stroke="#3E9B45" stroke-width="${n1(1.2 * s)}" fill="none"/>` + leafV(x, y - s, s * .9, -1) +
+        circ(tx, ty + s, s, '#3E9B45') + `<path d="M${n1(tx)} ${n1(ty + 1.6 * s)} q${n1(-3.4 * s)} ${n1(2 * s)} ${n1(-1.6 * s)} ${n1(7 * s)} l${n1(1.6 * s)} ${n1(-1.4 * s)} l${n1(1.6 * s)} ${n1(1.4 * s)} q${n1(1.8 * s)} ${n1(-5 * s)} ${n1(-1.6 * s)} ${n1(-7 * s)}Z" fill="#fff" stroke="#B9CFE6" stroke-width="${n1(.5 * s)}"/>`; }
+    case 'xrose': { const cy = y - 8 * s;
+      return leafV(x, y, s * 1.2, -1) + leafV(x, y, s * 1.2, 1) + petals(x, cy, 5, 3.4 * s, 2.8 * s, 3.6 * s, '#FFFFFF') +
+        petals(x, cy, 5, 2.6 * s, 1.2 * s, 1.8 * s, '#FBCFE8') + circ(x, cy, 2 * s, '#FFD43B'); }
+    case 'crystal': { const cy = y - 9 * s; let r = '';
+      for(let k = 0; k < 6; k++){ const a = k * Math.PI / 3, ex = x + Math.cos(a) * 6 * s, ey = cy + Math.sin(a) * 6 * s;
+        r += `<line x1="${n1(x)}" y1="${n1(cy)}" x2="${n1(ex)}" y2="${n1(ey)}" stroke="#7DC3EE" stroke-width="${n1(1.6 * s)}" stroke-linecap="round"/>` + circ(ex, ey, 1.1 * s, '#fff'); }
+      return r + circ(x, cy, 1.8 * s, '#fff'); }
+    case 'hibiscus': { const cy = y - 13 * s;
+      return stemV(x, y, 13, s, 1) + leafV(x, y - 3 * s, s * 1.1, -1) + leafV(x, y - 6 * s, s, 1) +
+        petals(x, cy, 5, 3.8 * s, 3 * s, 3.8 * s, c) + petals(x, cy, 5, 1.8 * s, 1.2 * s, 1.6 * s, '#000', 0, ' opacity=".15"') +
+        `<line x1="${n1(x)}" y1="${n1(cy)}" x2="${n1(x + 3 * s)}" y2="${n1(cy - 5 * s)}" stroke="#FFD43B" stroke-width="${n1(s)}"/>` + circ(x + 3 * s, cy - 5 * s, s, '#FFD43B'); }
+    case 'plumeria': { const cy = y - 8 * s;
+      return leafV(x, y, s * 1.3, -1) + leafV(x, y, s * 1.3, 1) + petals(x, cy, 5, 3.2 * s, 2.2 * s, 3.6 * s, '#FFFFFF', 18) +
+        circ(x, cy, 2.4 * s, '#FFD43B') + circ(x, cy, s, '#FFB020'); }
+  }
+  return '';
+}
+function flowerBed(cx, cy, w, th, rng, skip){
+  const FL = FL_TYPES[th.key], soil = th.key === 'winter' ? '#E3EDF8' : th.key === 'zucker' ? '#F7C9A0' : '#8B5A2B';
+  let ground = `<ellipse cx="${n1(cx)}" cy="${n1(cy + 2)}" rx="${n1(w / 2 + 5)}" ry="11" fill="${th.key === 'winter' ? '#C8D9EC' : '#5E9E4A'}" opacity=".55"/><ellipse cx="${n1(cx)}" cy="${n1(cy)}" rx="${n1(w / 2)}" ry="8" fill="${soil}" opacity=".7"/>`;
+  const items = [];
+  for(let row = 0; row < 2; row++) for(let k = 0; k < Math.floor(w / 9); k++){
+    const x = cx - w / 2 + 6 + k * 9 + (row ? 4.5 : 0) + (rng() - .5) * 2, y = cy - 3 + row * 6;
+    if(skip(x, y)) continue;
+    items.push({y, svg: fancyFlower(FL[(k + row * 2) % FL.length], x, y, .62 + rng() * .14, th.flowers[(k + row) % th.flowers.length])});
+  }
+  return {ground, items};
+}
+
 /* ---------- Das Märchenschloss (lokal: x 0..200, Boden y=170) ---------- */
 function castleSVG(open, P){
   const u = id => `url(#${P}${id})`, WIN = open ? u('wg') : u('wn');
@@ -1142,6 +1209,10 @@ function castleSVG(open, P){
       <path d="M${x - 8.5} 60 L${x} 36 L${x + 8.5} 60 Q${x} 63 ${x - 8.5} 60Z" fill="${u('rp')}"/>${fin(x, 36)}<rect x="${x - 1.6}" y="65" width="3.2" height="8" rx="1.6" fill="${WIN}"/>`;
   const banner = x => `<rect x="${x - 1}" y="126" width="14" height="2.6" rx="1.2" fill="${u('gd')}"/><path d="M${x} 128 h12 v23 l-6 -4.5 l-6 4.5Z" fill="#8B5CF6"/><path d="M${x} 128 h3 v21 l-3 2Z" fill="#fff" opacity=".18"/>
       <path d="M${x + 6} 135 c-1.5 -2.4 -5 -1 -3.4 1.6 l3.4 3 l3.4 -3 c1.6 -2.6 -1.9 -4 -3.4 -1.6z" fill="#FBBF24"/>`;
+  const fbox = (cx, y, w) => { const cols = ['#F43F5E', '#FFD43B', '#FB7185', '#A78BFA', '#F43F5E'];
+    let f = ''; for(let k = 0; k < 5; k++){ const fx = cx - w / 2 + 2 + k * (w - 4) / 4; f += circ(fx, y - 1.2 + (k % 2) * .6, 1.6, '#4FAE4F') + circ(fx + .3, y - 2.2 - (k % 2) * .5, 1.3, cols[k]); }
+    return f + `<rect x="${cx - w / 2}" y="${y}" width="${w}" height="3.6" rx="1" fill="#B0703F"/><rect x="${cx - w / 2}" y="${y}" width="${w}" height="1.1" fill="#fff" opacity=".25"/>`
+      + `<path d="M${cx - w / 2 + 1} ${y + 3.6} q-1 3 1 5 M${cx + w / 2 - 1} ${y + 3.6} q1 2.6 -.6 4.6" stroke="#4FAE4F" stroke-width="1" fill="none"/>`; };
   const lantern = x => `<rect x="${x - .8}" y="138" width="1.6" height="7" fill="#5B4636"/><rect x="${x - 3.2}" y="145" width="6.4" height="9" rx="1.6" fill="#5B4636"/><rect x="${x - 2}" y="146.6" width="4" height="5.6" rx="1" fill="#FFD966"/><circle cx="${x}" cy="149.5" r="7.5" fill="#FFE58A" opacity="${open ? .55 : .3}"/>`;
   const vine = (pts, flip) => { const d = pts; return `<path d="${d}" stroke="#3E9B45" stroke-width="1.6" fill="none" stroke-linecap="round"/>`; };
   const roses = arr => arr.map(([x, y], i) => i % 2 ? `<ellipse cx="${x}" cy="${y}" rx="2.6" ry="1.4" fill="#4FAE4F" transform="rotate(${i * 40} ${x} ${y})"/>` : `<circle cx="${x}" cy="${y}" r="2.1" fill="#F43F5E"/><circle cx="${x - .5}" cy="${y - .5}" r=".8" fill="#FDA4AF"/>`).join('');
@@ -1160,7 +1231,7 @@ function castleSVG(open, P){
     ${tower(34, 30, 24, 100, 58, 'rv', '#F472B6')}${win(46, 46, 9, 15)}
     ${tower(142, 30, 24, 100, 58, 'rv', '#F472B6')}${win(154, 46, 9, 15)}
     <rect x="54" y="74" width="92" height="96" fill="${u('wl')}"/><rect x="54" y="74" width="92" height="96" fill="${u('st')}"/>${merlons(55, 146, 74)}
-    ${win(68, 84, 10, 18)}${win(132, 84, 10, 18)}
+    ${win(68, 84, 10, 18)}${win(132, 84, 10, 18)}${fbox(68, 104.6, 18)}${fbox(132, 104.6, 18)}
     <circle cx="100" cy="99" r="12.5" fill="#E2B2CD"/><circle cx="100" cy="99" r="10.2" fill="${WIN}"/>
     ${Array.from({length: 8}, (_, k) => { const a = k * Math.PI / 4; return `<line x1="100" y1="99" x2="${n1(100 + Math.cos(a) * 10)}" y2="${n1(99 + Math.sin(a) * 10)}" stroke="#FBEAF3" stroke-width=".9"/>`; }).join('')}
     <circle cx="100" cy="99" r="4" fill="none" stroke="#FBEAF3" stroke-width=".9"/><circle cx="100" cy="99" r="1.9" fill="${u('gd')}"/>
@@ -1178,8 +1249,8 @@ function castleSVG(open, P){
     <path d="M78 170 V146 A22 22 0 0 1 122 146 V170Z" fill="#EDCADD" stroke="#D3A2C0" stroke-width="1"/>${vo}
     <path d="M96.5 122.5 h7 l-1.4 6 h-4.2Z" fill="${u('gd')}"/>
     ${door}${lantern(72)}${lantern(128)}
-    ${tower(2, 84, 32, 86, 50, 'rp', '#8B5CF6')}${win(18, 100, 10, 18)}${win(18, 134, 9, 15)}
-    ${tower(166, 84, 32, 86, 50, 'rp', '#8B5CF6')}${win(182, 100, 10, 18)}${win(182, 134, 9, 15)}
+    ${tower(2, 84, 32, 86, 50, 'rp', '#8B5CF6')}${win(18, 100, 10, 18)}${win(18, 134, 9, 15)}${fbox(18, 120.6, 17)}
+    ${tower(166, 84, 32, 86, 50, 'rp', '#8B5CF6')}${win(182, 100, 10, 18)}${win(182, 134, 9, 15)}${fbox(182, 120.6, 17)}
     ${vine('M5 170 C 13 156, 3 142, 12 128 S 8 106, 18 96')}${roses([[7, 160], [10, 152], [6, 141], [12, 129], [9, 118], [14, 106], [17, 98]])}
     ${vine('M195 170 C 187 158, 197 146, 189 134 S 193 120, 186 112')}${roses([[193, 162], [190, 154], [195, 145], [189, 134], [192, 124], [187, 114]])}
     <rect x="76" y="170" width="48" height="4" rx="1" fill="#E7C3D8"/><rect x="72" y="174" width="56" height="4" rx="1" fill="#D9AFC8"/>
@@ -1226,6 +1297,7 @@ function mapSVG(th, H, arrived){
   const treeOf = (type, x, y, s) => type === 'round' ? roundTree(x, y, s, th.treeC, rng() < .35) : type === 'pine' ? pine(x, y, s, th.pineC, false)
     : type === 'snowpine' ? pine(x, y, s, th.pineC, true) : type === 'palm' ? palm(x, y, s, th.treeC) : type === 'lolli' ? lolli(x, y, s, RI(th.flowers)) : bushV(x, y, s, th, rng);
   const forestType = {wald:'pine', winter:'snowpine', insel:'palm', zucker:'lolli'}[th.key];
+  const FL = FL_TYPES[th.key], fl = (x, y, s) => fancyFlower(RI(FL), x, y, s, RI(th.flowers));
 
   /* Himmel */
   let sky = '';
@@ -1273,7 +1345,7 @@ function mapSVG(th, H, arrived){
         if(x < 10 || x > 350 || nearCurve(x, y, 22)) continue; add(y, treeOf(forestType, x, y, R(.95, 1.25))); cnt++; }
     } else if(o.scene === 'flowers'){
       for(let k = 0; k < 18; k++){ const a = rng() * Math.PI * 2, rr = R(28, 50), x = p.x + Math.cos(a) * rr, y = p.y + Math.sin(a) * rr * .75 + 6;
-        if(nearCurve(x, y, 14)) continue; add(y, flowerV(x, y, RI(th.flowers), false)); }
+        if(nearCurve(x, y, 14)) continue; add(y, fl(x, y, R(.8, 1))); }
     } else if(o.scene === 'cave'){
       const spot = [[44, -8], [-44, -8], [0, -46], [0, 46]].map(([a, b]) => ({x: p.x + a, y: p.y + b})).find(q => q.x > 34 && q.x < 326 && !nearCurve(q.x, q.y, 30)) || {x: p.x + 44, y: p.y - 8};
       add(spot.y, caveV(spot.x, spot.y));
@@ -1300,6 +1372,36 @@ function mapSVG(th, H, arrived){
     riverSpan = [Math.min(xe, px - 36), Math.max(xe, px + 36)];
   }
 
+  /* Blumenwiesen */
+  let meadowGround = ''; const meadows = [];
+  for(let k = 0; k < 600 && meadows.length < 3; k++){
+    const x = R(50, 310), y = R(340, 780);
+    if(nearCurve(x, y, 46) || obsPts.some(p => Math.hypot(p.x - x, p.y - y) < 80) || (lake && Math.hypot(lake.x - x, lake.y - y) < 80)) continue;
+    if(riverSpan && x > riverSpan[0] - 20 && x < riverSpan[1] + 20 && Math.abs(y - ry) < 50) continue;
+    if(meadows.some(m => Math.hypot(m.x - x, m.y - y) < 120) || (x < 120 && y > 740)) continue;
+    meadows.push({x, y});
+    meadowGround += `<ellipse cx="${n1(x)}" cy="${n1(y)}" rx="38" ry="15" fill="${th.patch[1]}" opacity=".8"/><ellipse cx="${n1(x - 6)}" cy="${n1(y - 2)}" rx="24" ry="7" fill="#fff" opacity=".18"/>`;
+    for(let q = 0; q < 13; q++){ const a = rng() * Math.PI * 2, rr = Math.sqrt(rng()), fx = x + Math.cos(a) * 32 * rr, fy = y + Math.sin(a) * 11 * rr + 4;
+      add(fy, fl(fx, fy, R(.75, 1.05))); }
+    if(rng() < .7) add(y - 30, EMO(x + R(-14, 14), y - 26, 13, th.key === 'winter' ? '❄️' : RI(['🦋', '🐝', '🦋']), 'twk'));
+  }
+  /* Blumen am Wegesrand */
+  for(let f = .02, k = 0; f < .965; f += .021, k++){
+    const a = C.at(f - .003), b = C.at(f + .003), p = C.at(f), L = Math.hypot(b.x - a.x, b.y - a.y) || 1, nx = -(b.y - a.y) / L, ny = (b.x - a.x) / L;
+    const side = k % 2 ? 1 : -1, d = 16 + Math.max(0, ny * side) * 12 + rng() * 2, x = p.x + nx * d * side, y = p.y + ny * d * side;
+    if(x < 8 || x > 352 || (x < 70 && y > 760)) continue;
+    if(obsPts.some(q => Math.hypot(q.x - x, q.y - y) < 46)) continue;
+    if(riverSpan && x > riverSpan[0] && x < riverSpan[1] && Math.abs(y - ry) < 30) continue;
+    if(nearCurve(x, y, 14)) continue;
+    add(y, fl(x, y, R(.6, .78)));
+  }
+  /* Schlossgarten */
+  let gardenGround = '';
+  [[88, 300, 72], [276, 304, 70]].forEach(([cx, cy, w]) => {
+    const bed = flowerBed(cx, cy, w, th, rng, (x, y) => nearCurve(x, y, 16));
+    gardenGround += bed.ground; bed.items.forEach(it => add(it.y, it.svg));
+  });
+
   /* Deko */
   const used = []; let critters = 0;
   for(let k = 0; k < 1200 && used.length < 72; k++){
@@ -1308,6 +1410,8 @@ function mapSVG(th, H, arrived){
     if(x < 150 && y > 752) continue;
     if(riverSpan && x > riverSpan[0] && x < riverSpan[1] && Math.abs(y - ry) < 34) continue;
     if(lake && Math.hypot((lake.x - x) / 1.6, lake.y - y) < 34) continue;
+    if(meadows.some(m => Math.hypot((m.x - x) / 2, m.y - y) < 20)) continue;
+    if(y < 345 && ((x > 40 && x < 138) || (x > 228 && x < 324))) continue;  // Schlossgarten frei halten
     if(obsPts.some(p => Math.hypot(p.x - x, p.y - y) < 66)) continue;
     if(nearCurve(x, y, 26)) continue;
     if(used.some(([a, b]) => Math.hypot(a - x, b - y) < 21)) continue;
@@ -1316,7 +1420,7 @@ function mapSVG(th, H, arrived){
     if(t < .5){
       const type = th.key === 'wald' ? (rng() < .68 ? 'round' : 'pine') : th.key === 'insel' ? (rng() < .7 ? 'palm' : 'bush') : th.tree;
       add(y, treeOf(type, x, y, R(.8, 1.15)));
-    } else if(t < .72){ const n = 2 + Math.floor(rng() * 2); for(let q = 0; q < n; q++){ const fx = x + R(-8, 8), fy = y + R(-5, 5); add(fy, flowerV(fx, fy, RI(th.flowers), snow)); } }
+    } else if(t < .76){ const n = 3 + Math.floor(rng() * 3), ty = RI(FL); for(let q = 0; q < n; q++){ const fx = x + R(-10, 10), fy = y + R(-5, 5); add(fy, fancyFlower(rng() < .7 ? ty : RI(FL), fx, fy, R(.75, 1), RI(th.flowers))); } }
     else if(t < .84) add(y, bushV(x, y, R(.8, 1.1), th, rng));
     else if(t < .91) add(y, rockV(x, y, R(.7, 1.1), th.rock));
     else if(critters < 9){ critters++; add(y, EMO(x, y - 8, Math.round(R(15, 19)), RI(th.critters))); }
@@ -1347,8 +1451,8 @@ function mapSVG(th, H, arrived){
 
   /* Burgberg */
   const mound = `<ellipse cx="180" cy="270" rx="172" ry="42" fill="${th.hill}"/><ellipse cx="168" cy="260" rx="120" ry="22" fill="#fff" opacity=".18"/>`;
-  const moundDeco = rockV(28, 286, 1.1, th.rock) + rockV(334, 278, .9, th.rock) + bushV(56, 282, 1, th, rng) + bushV(306, 290, 1, th, rng) +
-    flowerV(78, 292, th.flowers[0], snow) + flowerV(86, 296, th.flowers[1], snow) + flowerV(284, 294, th.flowers[0], snow) + flowerV(276, 298, RI(th.flowers), snow);
+  const moundDeco = rockV(24, 290, 1.1, th.rock) + rockV(338, 282, .9, th.rock) + bushV(40, 284, 1, th, rng) + bushV(322, 292, 1, th, rng) +
+'';
 
   const deco = arrived
     ? `${EMO(150, 226, 18, '💕', 'twk')}${EMO(212, 222, 18, '💕', 'twk')}${EMO(64, 120, 16, '✨', 'twk')}${EMO(298, 112, 16, '✨', 'twk')}${EMO(180, 12, 14, '✨', 'twk')}`
@@ -1371,7 +1475,7 @@ function mapSVG(th, H, arrived){
     </defs>
     <rect width="360" height="840" fill="url(#msky)"/>${sky}${mtns}
     <path d="${landD}" fill="url(#mland)"/><path d="${landD}" fill="url(#mtx)"/>
-    ${patches}${groundScenes}${lakeSvg}${mound}
+    ${patches}${groundScenes}${lakeSvg}${meadowGround}${mound}${gardenGround}
     <path d="${C.d}" fill="none" stroke="${th.trailEdge}" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="${C.d}" fill="none" stroke="${th.trail}" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="${C.d}" fill="none" stroke="${th.trailEdge}" stroke-opacity=".45" stroke-width="3" stroke-dasharray="1 9" stroke-linecap="round"/>
