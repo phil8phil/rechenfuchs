@@ -20,6 +20,11 @@ Web-App (PWA) für iPhone und iPad: kein Server, kein Login, alle Daten bleiben 
 8. 🎲 Rückwärts bis 50
 9. 🎃 Süßes oder Rechnen – Halloween-Brettspiel auf dem Kürbisfeld
 
+**Zahlenstrahl – Zahlen sehen** (visuelle Vorstellung von 0 bis 100)
+10. 📍 Wo wohnt die Zahl? – Zahl durch Tippen/Ziehen auf dem Zahlenstrahl zeigen (Schätzen)
+11. 🔎 Zahlen-Lupe – ablesen, wo der Fuchs steht (mit Lupe auf einen Zehner, Zahlendreher-Fallen)
+12. 🐸 Frosch-Sprünge – Plus und Minus als Sprünge, mit Zwischenstopp am Zehner
+
 **Reise zum Schloss (Gesamtziel):** Jede richtige Antwort ist ein Schritt auf der Karte. König oder Königin
 wandert an 6 Hindernissen vorbei zum Märchenschloss, wo der Partner wartet. Ziel: 120 ⭐ (ca. 1 Woche, im
 Eltern-Bereich auf 80–200 einstellbar). Danach gibt es ein Schlossfest, einen Reise-Pokal, und das Kind sucht sich die nächste Karte aus
@@ -56,7 +61,7 @@ Der Eltern-Bereich (mit kleiner Rechenfrage gesichert) zeigt Statistik, knifflig
 
 Nach jeder Änderung in `sw.js` die Version erhöhen:
 ```js
-const CACHE = 'rechenfuchs-v1.4.1';
+const CACHE = 'rechenfuchs-v1.5.1';
 ```
 Sonst lädt das iPhone die neue Version nicht. Danach die App einmal schließen und neu öffnen.
 
