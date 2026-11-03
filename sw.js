@@ -1,7 +1,10 @@
 /* Rechenfuchs – Service Worker
    WICHTIG: Bei jeder Änderung an einer Datei die CACHE-Version erhöhen,
-   sonst lädt das iPhone die neue Version nicht. */
-const CACHE = 'rechenfuchs-v1.5.0';
+   sonst lädt das iPhone die neue Version nicht.
+   Mehrere Apps teilen sich die Domain phil8phil.github.io: deshalb nur die
+   eigenen Caches (Präfix 'rechenfuchs-') anfassen. */
+const PREFIX = 'rechenfuchs-';
+const CACHE = PREFIX + 'v1.5.1';
 const ASSETS = [
   './',
   './index.html',
@@ -18,7 +21,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k.startsWith(PREFIX) && k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -43,7 +46,8 @@ self.addEventListener('fetch', event => {
         }
         return res;
       } catch (e) {
-        return (await caches.match(req)) || (await caches.match('./index.html')) || (await caches.match('./'));
+        const c = await caches.open(CACHE);
+        return (await c.match(req)) || (await c.match('./index.html')) || (await c.match('./'));
       }
     })());
     return;
@@ -51,7 +55,7 @@ self.addEventListener('fetch', event => {
 
   // Übrige Dateien: zuerst Cache, sonst Netz
   event.respondWith(
-    caches.match(req).then(hit => hit || fetch(req).then(res => {
+    caches.open(CACHE).then(c => c.match(req)).then(hit => hit || fetch(req).then(res => {
       if (res && res.ok) {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(req, copy));

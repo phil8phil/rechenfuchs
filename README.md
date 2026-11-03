@@ -61,7 +61,7 @@ Der Eltern-Bereich (mit kleiner Rechenfrage gesichert) zeigt Statistik, knifflig
 
 Nach jeder Änderung in `sw.js` die Version erhöhen:
 ```js
-const CACHE = 'rechenfuchs-v1.5.1';
+const CACHE = 'rechenfuchs-v1.5.2';
 ```
 Sonst lädt das iPhone die neue Version nicht. Danach die App einmal schließen und neu öffnen.
 
